@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LaunchControl — Painel da Oficina</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header class="topbar">
+  <div class="topbar__brand">
+    <span class="brand-mark">AT</span>
+    <div class="brand-text">
+      <strong>LaunchControl</strong>
+      <small>Painel do parceiro</small>
+    </div>
+  </div>
+
+  <div class="topbar__actions">
+    <button class="icon-btn" id="btnNotif" title="Notificações">
+      🔔
+      <span class="badge-dot">3</span>
+    </button>
+    <div class="topbar__user">
+      <div class="avatar">CM</div>
+      <div class="user-text">
+        <strong>Carlos Mendes</strong>
+        <small>Atendente</small>
+      </div>
+    </div>
+    <button class="btn btn--ghost" id="btnLogout">Sair</button>
+  </div>
+</header>
+
+<div class="stripe" aria-hidden="true"></div>
+
+<div class="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <nav class="sidebar">
+    <ul>
+      <li><a href="#" class="nav-link is-active" data-view="dashboard"><span class="nav-ico">▣</span>Dashboard</a></li>
+      <li><a href="#" class="nav-link" data-view="solicitacoes"><span class="nav-ico">▤</span>Solicitações</a></li>
+      <li><a href="#" class="nav-link" data-view="orcamentos"><span class="nav-ico">▦</span>Orçamentos</a></li>
+      <li><a href="#" class="nav-link" data-view="andamento"><span class="nav-ico">◐</span>Serviços em andamento</a></li>
+      <li><a href="#" class="nav-link" data-view="concluidos"><span class="nav-ico">✔</span>Serviços concluídos</a></li>
+      <li><a href="#" class="nav-link" data-view="clientes"><span class="nav-ico">☺</span>Clientes</a></li>
+      <li><a href="#" class="nav-link" data-view="veiculos"><span class="nav-ico">🚗</span>Veículos</a></li>
+      <li><a href="#" class="nav-link" data-view="config"><span class="nav-ico">⚙</span>Configurações</a></li>
+    </ul>
+    <div class="sidebar__foot">
+      <p>Conectado à plataforma</p>
+      <strong>LaunchControl</strong>
+    </div>
+  </nav>
+
+  <!-- ============ MAIN CONTENT ============ -->
+  <main class="content">
+
+    <!-- ---------- VIEW: DASHBOARD ---------- -->
+    <section id="view-dashboard" class="view is-active">
+      <div class="view-head">
+        <div>
+          <h1>Dashboard</h1>
+          <p class="subtitle">Visão geral do que está acontecendo na oficina hoje.</p>
+        </div>
+      </div>
+
+      <div class="cards-grid" id="kpiCards">
+        <!-- preenchido via JS -->
+      </div>
+
+      <div class="panel">
+        <div class="panel__head">
+          <h2>Solicitações recentes</h2>
+          <a href="#" class="link-more" data-view="solicitacoes">Ver todas →</a>
+        </div>
+        <div class="req-list" id="recentRequests">
+          <!-- preenchido via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- VIEW: SOLICITAÇÕES ---------- -->
+    <section id="view-solicitacoes" class="view">
+      <div class="view-head">
+        <div>
+          <h1>Solicitações</h1>
+          <p class="subtitle">Pedidos de orçamento encaminhados pela plataforma LaunchControl.</p>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="req-list" id="allRequests">
+          <!-- preenchido via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- VIEW: ORÇAMENTOS ---------- -->
+    <section id="view-orcamentos" class="view">
+      <div class="view-head">
+        <div>
+          <h1>Orçamentos</h1>
+          <p class="subtitle">Propostas elaboradas pela oficina, aguardando resposta do cliente.</p>
+        </div>
+      </div>
+      <div class="panel">
+        <table class="data-table" id="orcamentosTable">
+          <thead>
+            <tr><th>Cliente</th><th>Veículo</th><th>Serviço</th><th>Valor total</th><th>Status</th></tr>
+          </thead>
+          <tbody><!-- preenchido via JS --></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ---------- VIEW: SERVIÇOS EM ANDAMENTO ---------- -->
+    <section id="view-andamento" class="view">
+      <div class="view-head">
+        <div>
+          <h1>Serviços em andamento</h1>
+          <p class="subtitle">Acompanhamento dos veículos que estão sendo atendidos.</p>
+        </div>
+      </div>
+      <div class="panel">
+        <table class="data-table" id="andamentoTable">
+          <thead>
+            <tr>
+              <th>Cliente</th><th>Veículo</th><th>Serviço</th>
+              <th>Entrada</th><th>Previsão</th><th>Status</th>
+            </tr>
+          </thead>
+          <tbody><!-- preenchido via JS --></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ---------- VIEW: PLACEHOLDER (Concluídos, Clientes, Veículos, Config) ---------- -->
+    <section id="view-concluidos" class="view">
+      <div class="view-head"><div><h1>Serviços concluídos</h1><p class="subtitle">Histórico de atendimentos finalizados.</p></div></div>
+      <div class="panel empty-panel">
+        <p>🚧 Esta tela ainda não foi implementada nesta primeira versão do protótipo.</p>
+      </div>
+    </section>
+    <section id="view-clientes" class="view">
+      <div class="view-head"><div><h1>Clientes</h1><p class="subtitle">Base de clientes atendidos pela oficina.</p></div></div>
+      <div class="panel empty-panel"><p>🚧 Esta tela ainda não foi implementada nesta primeira versão do protótipo.</p></div>
+    </section>
+    <section id="view-veiculos" class="view">
+      <div class="view-head"><div><h1>Veículos</h1><p class="subtitle">Veículos já atendidos pela oficina.</p></div></div>
+      <div class="panel empty-panel"><p>🚧 Esta tela ainda não foi implementada nesta primeira versão do protótipo.</p></div>
+    </section>
+    <section id="view-config" class="view">
+      <div class="view-head"><div><h1>Configurações</h1><p class="subtitle">Preferências da conta e da oficina.</p></div></div>
+      <div class="panel empty-panel"><p>🚧 Esta tela ainda não foi implementada nesta primeira versão do protótipo.</p></div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ============ MODAL: DETALHES DA SOLICITAÇÃO ============ -->
+<div class="modal-overlay" id="modalDetalhe">
+  <div class="modal modal--wide">
+    <div class="modal__head">
+      <h2>Detalhes da solicitação</h2>
+      <button class="icon-btn" id="closeDetalhe">✕</button>
+    </div>
+    <div class="modal__body" id="detalheBody">
+      <!-- preenchido via JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL: ELABORAR ORÇAMENTO ============ -->
+<div class="modal-overlay" id="modalOrcamento">
+  <div class="modal modal--wide">
+    <div class="modal__head">
+      <h2>Elaborar orçamento</h2>
+      <button class="icon-btn" id="closeOrcamento">✕</button>
+    </div>
+    <form class="modal__body" id="formOrcamento">
+      <input type="hidden" id="orcSolicitacaoId">
+
+      <div class="form-row">
+        <label>Serviço
+          <input type="text" id="orcServico" required>
+        </label>
+      </div>
+
+      <div class="form-row">
+        <label>Descrição
+          <textarea id="orcDescricao" rows="2" placeholder="Detalhe o que será feito"></textarea>
+        </label>
+      </div>
+
+      <div class="form-row">
+        <label>Peças utilizadas
+          <input type="text" id="orcPecas" placeholder="Ex: Pastilhas dianteiras">
+        </label>
+      </div>
+
+      <div class="form-grid">
+        <label>Valor das peças (R$)
+          <input type="number" id="orcValorPecas" min="0" step="0.01" value="0" required>
+        </label>
+        <label>Mão de obra (R$)
+          <input type="number" id="orcMaoDeObra" min="0" step="0.01" value="0" required>
+        </label>
+        <label>Prazo estimado
+          <input type="text" id="orcPrazo" placeholder="Ex: 2 horas" required>
+        </label>
+      </div>
+
+      <div class="form-row">
+        <label>Observações
+          <textarea id="orcObs" rows="2" placeholder="Informações adicionais para o cliente"></textarea>
+        </label>
+      </div>
+
+      <div class="total-box">
+        <span>Valor total</span>
+        <strong id="orcTotal">R$ 0,00</strong>
+      </div>
+
+      <div class="modal__actions">
+        <button type="button" class="btn btn--ghost" id="cancelOrcamento">Cancelar</button>
+        <button type="submit" class="btn btn--primary">Enviar orçamento ao cliente</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============ TOAST ============ -->
+<div class="toast" id="toast"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
