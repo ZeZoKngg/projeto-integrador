@@ -3,183 +3,541 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LaunchControl — Painel da Oficina</title>
+<title>LaunchControl Oficina — Painel</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- ============ HEADER ============ -->
-<header class="topbar">
-  <div class="topbar__brand">
-    <span class="brand-mark">AT</span>
-    <div class="brand-text">
-      <strong>LaunchControl</strong>
-      <small>Painel do parceiro</small>
+<!-- =========================================================
+     TELA DE LOGIN
+     Autenticação simulada (mock/localStorage) — sem backend real.
+     Ponto de integração futura: substituir autenticarUsuario() em
+     script.js por uma chamada real a uma API de autenticação.
+     ========================================================= -->
+<div class="login-screen" id="telaLogin">
+  <div class="login-card">
+    <div class="login-card__brand">
+      <span class="brand-mark">LC</span>
+      <div class="brand-text">
+        <strong>LaunchControl</strong>
+        <small>Plataforma para oficinas e clientes</small>
+      </div>
+    </div>
+
+    <h1>Entrar</h1>
+    <p class="subtitle">Acesse com seu CPF e senha.</p>
+
+    <div class="segmented" id="tipoUsuarioSeg">
+      <button type="button" class="segmented__opt is-active" data-tipo="oficina">Sou da oficina</button>
+      <button type="button" class="segmented__opt" data-tipo="cliente">Sou cliente</button>
+    </div>
+
+    <form id="formLogin" novalidate>
+      <input type="hidden" id="loginTipo" value="oficina">
+
+      <label class="field">
+        CPF
+        <input type="text" id="loginCpf" inputmode="numeric" placeholder="000.000.000-00" maxlength="14" autocomplete="username" required>
+        <span class="field-error" id="erroCpf"></span>
+      </label>
+
+      <label class="field">
+        Senha
+        <input type="password" id="loginSenha" placeholder="Digite sua senha" autocomplete="current-password" required>
+        <span class="field-error" id="erroSenha"></span>
+      </label>
+
+      <span class="field-error" id="erroLogin"></span>
+
+      <button type="submit" class="btn btn--primary btn--block">Entrar</button>
+      <button type="button" class="btn-link" id="btnEsqueciSenha">Esqueci minha senha</button>
+      <button type="button" class="btn-link" id="btnIrParaCadastro">Não tem conta? Cadastre-se</button>
+      <button type="button" class="btn-link" id="btnIrParaSobreNos">Sobre a LaunchControl</button>
+    </form>
+
+    <div class="login-hint">
+      <strong>Usuários de teste</strong>
+      <p>Oficina — CPF <span class="mono">111.111.111-11</span> · senha <span class="mono">123456</span></p>
+      <p>Cliente — CPF <span class="mono">222.222.222-22</span> · senha <span class="mono">123456</span></p>
     </div>
   </div>
+</div>
 
-  <div class="topbar__actions">
-    <button class="icon-btn" id="btnNotif" title="Notificações">
-      🔔
-      <span class="badge-dot">3</span>
-    </button>
-    <div class="topbar__user">
-      <div class="avatar">CM</div>
-      <div class="user-text">
-        <strong>Carlos Mendes</strong>
-        <small>Atendente</small>
+<!-- =========================================================
+     TELA DE CADASTRO
+     Criação de conta simulada (mock/localStorage) — sem backend real.
+     Ponto de integração futura: substituir cadastrarUsuario() em
+     script.js por uma chamada real a uma API (POST /auth/cadastro).
+     ========================================================= -->
+<div class="login-screen" id="telaCadastro" style="display:none;">
+  <div class="login-card">
+    <div class="login-card__brand">
+      <span class="brand-mark">LC</span>
+      <div class="brand-text">
+        <strong>LaunchControl</strong>
+        <small>Plataforma para oficinas e clientes</small>
       </div>
     </div>
-    <button class="btn btn--ghost" id="btnLogout">Sair</button>
+
+    <h1>Criar conta</h1>
+    <p class="subtitle">Preencha seus dados para começar a usar a LaunchControl.</p>
+
+    <div class="segmented" id="tipoCadastroSeg">
+      <button type="button" class="segmented__opt is-active" data-tipo="cliente">Sou cliente</button>
+      <button type="button" class="segmented__opt" data-tipo="oficina">Sou da oficina</button>
+    </div>
+
+    <form id="formCadastro" novalidate>
+      <input type="hidden" id="cadastroTipo" value="cliente">
+
+      <label class="field">
+        Nome completo
+        <input type="text" id="cadastroNome" placeholder="Digite seu nome completo" autocomplete="name" required>
+        <span class="field-error" id="erroCadastroNome"></span>
+      </label>
+
+      <label class="field">
+        CPF
+        <input type="text" id="cadastroCpf" inputmode="numeric" placeholder="000.000.000-00" maxlength="14" autocomplete="off" required>
+        <span class="field-error" id="erroCadastroCpf"></span>
+      </label>
+
+      <label class="field" id="campoCadastroTelefone">
+        Telefone
+        <input type="text" id="cadastroTelefone" inputmode="numeric" placeholder="(00) 00000-0000" maxlength="15" autocomplete="tel">
+        <span class="field-error" id="erroCadastroTelefone"></span>
+      </label>
+
+      <label class="field" id="campoCadastroEmail">
+        E-mail
+        <input type="email" id="cadastroEmail" placeholder="seuemail@exemplo.com" autocomplete="email">
+        <span class="field-error" id="erroCadastroEmail"></span>
+      </label>
+
+      <label class="field" id="campoCadastroCargo" style="display:none;">
+        Cargo
+        <input type="text" id="cadastroCargo" placeholder="Ex.: Atendente, Gerente" autocomplete="off">
+        <span class="field-error" id="erroCadastroCargo"></span>
+      </label>
+
+      <label class="field">
+        Senha
+        <input type="password" id="cadastroSenha" placeholder="Crie uma senha (mín. 6 caracteres)" autocomplete="new-password" required>
+        <span class="field-error" id="erroCadastroSenha"></span>
+      </label>
+
+      <label class="field">
+        Confirmar senha
+        <input type="password" id="cadastroConfirmarSenha" placeholder="Repita a senha" autocomplete="new-password" required>
+        <span class="field-error" id="erroCadastroConfirmarSenha"></span>
+      </label>
+
+      <span class="field-error" id="erroCadastro"></span>
+
+      <button type="submit" class="btn btn--primary btn--block">Criar conta</button>
+      <button type="button" class="btn-link" id="btnVoltarParaLogin">Já tenho conta? Entrar</button>
+    </form>
   </div>
-</header>
+</div>
 
-<div class="stripe" aria-hidden="true"></div>
+<!-- =========================================================
+     TELA SOBRE NÓS
+     Página institucional, integrada como uma tela do próprio app
+     (mesmo padrão de telaLogin/telaCadastro), acessível a partir
+     do link "Sobre a LaunchControl" na tela de login.
+     ========================================================= -->
+<div class="about-page" id="telaSobreNos" style="display:none;">
 
-<div class="app">
-
-  <!-- ============ SIDEBAR ============ -->
-  <nav class="sidebar">
-    <ul>
-      <li><a href="#" class="nav-link is-active" data-view="dashboard"><span class="nav-ico">▣</span>Dashboard</a></li>
-      <li><a href="#" class="nav-link" data-view="solicitacoes"><span class="nav-ico">▤</span>Solicitações</a></li>
-      <li><a href="#" class="nav-link" data-view="orcamentos"><span class="nav-ico">▦</span>Orçamentos</a></li>
-      <li><a href="#" class="nav-link" data-view="andamento"><span class="nav-ico">◐</span>Serviços em andamento</a></li>
-      <li><a href="#" class="nav-link" data-view="concluidos"><span class="nav-ico">✔</span>Serviços concluídos</a></li>
-      <li><a href="#" class="nav-link" data-view="clientes"><span class="nav-ico">☺</span>Clientes</a></li>
-      <li><a href="#" class="nav-link" data-view="veiculos"><span class="nav-ico">🚗</span>Veículos</a></li>
-      <li><a href="#" class="nav-link" data-view="config"><span class="nav-ico">⚙</span>Configurações</a></li>
-    </ul>
-    <div class="sidebar__foot">
-      <p>Conectado à plataforma</p>
-      <strong>LaunchControl</strong>
+  <header class="about-topbar">
+    <div class="about-topbar__brand">
+      <span class="brand-mark">LC</span>
+      <div class="brand-text">
+        <strong>LaunchControl</strong>
+        <small>Plataforma para oficinas e clientes</small>
+      </div>
     </div>
-  </nav>
+    <nav class="about-nav">
+      <a href="#" id="linkSobreNosInicio">Início</a>
+      <a href="#" class="is-active">Sobre nós</a>
+    </nav>
+    <div class="about-topbar__actions">
+      <button type="button" class="btn btn--ghost btn--small" id="btnSobreNosEntrar">Entrar</button>
+      <button type="button" class="btn btn--primary btn--small" id="btnSobreNosCriarConta">Criar conta</button>
+    </div>
+  </header>
 
-  <!-- ============ MAIN CONTENT ============ -->
-  <main class="content">
+  <section class="about-hero">
+    <span class="about-eyebrow">Sobre a LaunchControl</span>
+    <h1>Conectamos oficinas e clientes em um só lugar</h1>
+    <p>A LaunchControl nasceu para simplificar a relação entre oficinas mecânicas e seus clientes, do orçamento à entrega do serviço — tudo em uma plataforma transparente e organizada.</p>
+  </section>
 
-    <!-- ---------- VIEW: DASHBOARD ---------- -->
-    <section id="view-dashboard" class="view is-active">
-      <div class="view-head">
-        <div>
-          <h1>Dashboard</h1>
-          <p class="subtitle">Visão geral do que está acontecendo na oficina hoje.</p>
-        </div>
-      </div>
+  <main class="about-content">
+    <div class="about-section-head">
+      <span class="about-kicker">Quem somos</span>
+      <h2>Uma plataforma feita para o dia a dia da oficina</h2>
+      <p>O LaunchControl é uma plataforma digital criada para conectar clientes, oficinas e fornecedores de peças e serviços automotivos em um único ambiente. Reunimos solicitações, orçamentos e acompanhamento de serviços para tornar a manutenção veicular mais prática, organizada e transparente.</p>
+    </div>
 
-      <div class="cards-grid" id="kpiCards">
-        <!-- preenchido via JS -->
+    <div class="about-pillars-grid">
+      <div class="about-pillar-card">
+        <div class="about-pillar-card__icon">◎</div>
+        <h3>Missão</h3>
+        <p>Conectar oficinas, clientes e fornecedores em uma plataforma completa para organizar solicitações, orçamentos, serviços, clientes e veículos, tornando a gestão automotiva mais simples, transparente e eficiente.</p>
       </div>
+      <div class="about-pillar-card">
+        <div class="about-pillar-card__icon">✦</div>
+        <h3>Propósito</h3>
+        <p>Tornar o processo de manutenção automotiva mais organizado e acessível. O LaunchControl existe para reunir informações e facilitar a comunicação, ajudando os usuários a encontrar soluções, comparar alternativas e acompanhar os serviços com mais confiança.</p>
+      </div>
+    </div>
 
-      <div class="panel">
-        <div class="panel__head">
-          <h2>Solicitações recentes</h2>
-          <a href="#" class="link-more" data-view="solicitacoes">Ver todas →</a>
-        </div>
-        <div class="req-list" id="recentRequests">
-          <!-- preenchido via JS -->
-        </div>
-      </div>
-    </section>
+    <div class="about-section-head">
+      <span class="about-kicker">O que nos guia</span>
+      <h2>Nossos valores</h2>
+      <p>Princípios que orientam como construímos a LaunchControl e como esperamos que oficinas e clientes se relacionem por meio dela.</p>
+    </div>
 
-    <!-- ---------- VIEW: SOLICITAÇÕES ---------- -->
-    <section id="view-solicitacoes" class="view">
-      <div class="view-head">
-        <div>
-          <h1>Solicitações</h1>
-          <p class="subtitle">Pedidos de orçamento encaminhados pela plataforma LaunchControl.</p>
-        </div>
+    <div class="about-values-grid">
+      <div class="about-value-card">
+        <span class="about-value-num">01</span>
+        <h4>Transparência</h4>
+        <p>Informações claras para facilitar a comparação entre serviços, peças e orçamentos e apoiar decisões mais seguras.</p>
       </div>
-      <div class="panel">
-        <div class="req-list" id="allRequests">
-          <!-- preenchido via JS -->
-        </div>
+      <div class="about-value-card">
+        <span class="about-value-num">02</span>
+        <h4>Praticidade</h4>
+        <p>Simplificar a pesquisa, contratação e acompanhamento dos serviços automotivos, reduzindo processos desnecessários.</p>
       </div>
-    </section>
+      <div class="about-value-card">
+        <span class="about-value-num">03</span>
+        <h4>Confiança</h4>
+        <p>Promover relações mais seguras entre clientes, oficinas e fornecedores por meio de informações organizadas e acessíveis.</p>
+      </div>
+      <div class="about-value-card">
+        <span class="about-value-num">04</span>
+        <h4>Inovação</h4>
+        <p>Utilizar a tecnologia para modernizar o setor automotivo e melhorar a experiência de todos os participantes.</p>
+      </div>
+      <div class="about-value-card">
+        <span class="about-value-num">05</span>
+        <h4>Eficiência</h4>
+        <p>Organizar processos e informações para tornar a gestão de serviços mais produtiva e objetiva.</p>
+      </div>
+      <div class="about-value-card">
+        <span class="about-value-num">06</span>
+        <h4>Conexão</h4>
+        <p>Aproximar clientes, oficinas e fornecedores em um ambiente digital centralizado e integrado.</p>
+      </div>
+    </div>
 
-    <!-- ---------- VIEW: ORÇAMENTOS ---------- -->
-    <section id="view-orcamentos" class="view">
-      <div class="view-head">
-        <div>
-          <h1>Orçamentos</h1>
-          <p class="subtitle">Propostas elaboradas pela oficina, aguardando resposta do cliente.</p>
-        </div>
+    <div class="about-band">
+      <div>
+        <h3>Pronto para organizar sua oficina ou seus veículos?</h3>
+        <p>Crie sua conta gratuita e comece a usar a LaunchControl agora mesmo.</p>
       </div>
-      <div class="panel">
-        <table class="data-table" id="orcamentosTable">
-          <thead>
-            <tr><th>Cliente</th><th>Veículo</th><th>Serviço</th><th>Valor total</th><th>Status</th></tr>
-          </thead>
-          <tbody><!-- preenchido via JS --></tbody>
-        </table>
+      <div class="about-band__actions">
+        <button type="button" class="btn btn--ghost" id="btnSobreNosEntrarBand">Entrar</button>
+        <button type="button" class="btn btn--primary" id="btnSobreNosCriarContaBand">Criar conta</button>
       </div>
-    </section>
-
-    <!-- ---------- VIEW: SERVIÇOS EM ANDAMENTO ---------- -->
-    <section id="view-andamento" class="view">
-      <div class="view-head">
-        <div>
-          <h1>Serviços em andamento</h1>
-          <p class="subtitle">Acompanhamento dos veículos que estão sendo atendidos.</p>
-        </div>
-      </div>
-      <div class="panel">
-        <table class="data-table" id="andamentoTable">
-          <thead>
-            <tr>
-              <th>Cliente</th><th>Veículo</th><th>Serviço</th>
-              <th>Entrada</th><th>Previsão</th><th>Status</th>
-            </tr>
-          </thead>
-          <tbody><!-- preenchido via JS --></tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- ---------- VIEW: PLACEHOLDER (Concluídos, Clientes, Veículos, Config) ---------- -->
-    <section id="view-concluidos" class="view">
-      <div class="view-head"><div><h1>Serviços concluídos</h1><p class="subtitle">Histórico de atendimentos finalizados.</p></div></div>
-      <div class="panel empty-panel">
-        <p>🚧 Esta tela ainda não foi implementada nesta primeira versão do protótipo.</p>
-      </div>
-    </section>
-    <section id="view-clientes" class="view">
-      <div class="view-head"><div><h1>Clientes</h1><p class="subtitle">Base de clientes atendidos pela oficina.</p></div></div>
-      <div class="panel empty-panel"><p>🚧 Esta tela ainda não foi implementada nesta primeira versão do protótipo.</p></div>
-    </section>
-    <section id="view-veiculos" class="view">
-      <div class="view-head"><div><h1>Veículos</h1><p class="subtitle">Veículos já atendidos pela oficina.</p></div></div>
-      <div class="panel empty-panel"><p>🚧 Esta tela ainda não foi implementada nesta primeira versão do protótipo.</p></div>
-    </section>
-    <section id="view-config" class="view">
-      <div class="view-head"><div><h1>Configurações</h1><p class="subtitle">Preferências da conta e da oficina.</p></div></div>
-      <div class="panel empty-panel"><p>🚧 Esta tela ainda não foi implementada nesta primeira versão do protótipo.</p></div>
-    </section>
-
+    </div>
   </main>
 </div>
 
-<!-- ============ MODAL: DETALHES DA SOLICITAÇÃO ============ -->
+<!-- =========================================================
+     PAINEL DA OFICINA
+     ========================================================= -->
+<div class="app-shell" id="appOficina" style="display:none;">
+
+  <header class="topbar">
+    <div class="topbar__brand">
+      <span class="brand-mark">LC</span>
+      <div class="brand-text">
+        <strong>LaunchControl</strong>
+        <small>Painel do parceiro</small>
+      </div>
+    </div>
+
+    <div class="topbar__actions">
+      <button class="icon-btn" id="btnNotif" title="Notificações">
+        🔔
+        <span class="badge-dot">3</span>
+      </button>
+      <div class="topbar__user">
+        <div class="avatar" id="oficinaAvatar">CM</div>
+        <div class="user-text">
+          <strong id="oficinaNome">Carlos Mendes</strong>
+          <small id="oficinaCargo">Atendente</small>
+        </div>
+      </div>
+      <button class="btn btn--ghost" id="btnLogoutOficina">Sair</button>
+    </div>
+  </header>
+
+  <div class="stripe" aria-hidden="true"></div>
+
+  <div class="app">
+
+    <nav class="sidebar">
+      <ul>
+        <li><a href="#" class="nav-link is-active" data-view="dashboard"><span class="nav-ico">▣</span>Dashboard</a></li>
+        <li><a href="#" class="nav-link" data-view="solicitacoes"><span class="nav-ico">▤</span>Solicitações</a></li>
+        <li><a href="#" class="nav-link" data-view="orcamentos"><span class="nav-ico">▦</span>Orçamentos</a></li>
+        <li><a href="#" class="nav-link" data-view="andamento"><span class="nav-ico">◐</span>Serviços em andamento</a></li>
+        <li><a href="#" class="nav-link" data-view="concluidos"><span class="nav-ico">✔</span>Serviços concluídos</a></li>
+        <li><a href="#" class="nav-link" data-view="clientes"><span class="nav-ico">☺</span>Clientes</a></li>
+        <li><a href="#" class="nav-link" data-view="veiculos"><span class="nav-ico">🚗</span>Veículos</a></li>
+        <li><a href="#" class="nav-link" data-view="config"><span class="nav-ico">⚙</span>Configurações</a></li>
+      </ul>
+      <div class="sidebar__foot">
+        <p>Conectado à plataforma</p>
+        <strong>LaunchControl</strong>
+      </div>
+    </nav>
+
+    <main class="content">
+
+      <section id="view-dashboard" class="view is-active">
+        <div class="view-head">
+          <div>
+            <h1>Dashboard</h1>
+            <p class="subtitle">Visão geral do que está acontecendo na oficina hoje.</p>
+          </div>
+        </div>
+        <div class="cards-grid" id="kpiCards"></div>
+        <div class="panel">
+          <div class="panel__head">
+            <h2>Solicitações recentes</h2>
+            <a href="#" class="link-more" data-view="solicitacoes">Ver todas →</a>
+          </div>
+          <div class="req-list" id="recentRequests"></div>
+        </div>
+      </section>
+
+      <section id="view-solicitacoes" class="view">
+        <div class="view-head">
+          <div>
+            <h1>Solicitações</h1>
+            <p class="subtitle">Pedidos de orçamento encaminhados pela plataforma LaunchControl.</p>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="req-list" id="allRequests"></div>
+        </div>
+      </section>
+
+      <section id="view-orcamentos" class="view">
+        <div class="view-head">
+          <div>
+            <h1>Orçamentos</h1>
+            <p class="subtitle">Propostas elaboradas pela oficina, aguardando resposta do cliente. Clique em uma linha para ver os detalhes.</p>
+          </div>
+        </div>
+        <div class="panel">
+          <table class="data-table" id="orcamentosTable">
+            <thead>
+              <tr><th>Cliente</th><th>Veículo</th><th>Serviço</th><th>Valor total</th><th>Status</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="view-andamento" class="view">
+        <div class="view-head">
+          <div>
+            <h1>Serviços em andamento</h1>
+            <p class="subtitle">Acompanhamento dos veículos que estão sendo atendidos.</p>
+          </div>
+        </div>
+        <div class="panel">
+          <table class="data-table" id="andamentoTable">
+            <thead>
+              <tr>
+                <th>Cliente</th><th>Veículo</th><th>Serviço</th>
+                <th>Entrada</th><th>Previsão</th><th>Status</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="view-concluidos" class="view">
+        <div class="view-head"><div><h1>Serviços concluídos</h1><p class="subtitle">Histórico de atendimentos finalizados.</p></div></div>
+        <div class="panel">
+          <table class="data-table" id="concluidosTable">
+            <thead><tr><th>Cliente</th><th>Veículo</th><th>Serviço</th><th>Data</th><th>Valor total</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="view-clientes" class="view">
+        <div class="view-head"><div><h1>Clientes</h1><p class="subtitle">Base de clientes atendidos pela oficina.</p></div></div>
+        <div class="panel">
+          <table class="data-table" id="clientesTable">
+            <thead><tr><th>Nome</th><th>CPF</th><th>Telefone</th><th>E-mail</th><th>Veículos</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="view-veiculos" class="view">
+        <div class="view-head"><div><h1>Veículos</h1><p class="subtitle">Veículos já atendidos pela oficina.</p></div></div>
+        <div class="panel">
+          <table class="data-table" id="veiculosTable">
+            <thead><tr><th>Veículo</th><th>Ano</th><th>Cliente</th><th>Último serviço</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="view-config" class="view">
+        <div class="view-head"><div><h1>Configurações</h1><p class="subtitle">Preferências da conta e da oficina.</p></div></div>
+        <div class="panel empty-panel"><p>🚧 Esta tela ainda não foi implementada nesta primeira versão do protótipo.</p></div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- =========================================================
+     PAINEL DO CLIENTE FINAL
+     ========================================================= -->
+<div class="app-shell" id="appCliente" style="display:none;">
+
+  <header class="topbar">
+    <div class="topbar__brand">
+      <span class="brand-mark">LC</span>
+      <div class="brand-text">
+        <strong>LaunchControl</strong>
+        <small>Portal do cliente</small>
+      </div>
+    </div>
+
+    <div class="topbar__actions">
+      <div class="topbar__user">
+        <div class="avatar" id="cliAvatar">JS</div>
+        <div class="user-text">
+          <strong id="cliNomeTopo">João Silva</strong>
+          <small>Cliente</small>
+        </div>
+      </div>
+      <button class="btn btn--ghost" id="btnLogoutCliente">Sair</button>
+    </div>
+  </header>
+
+  <div class="stripe" aria-hidden="true"></div>
+
+  <div class="app">
+
+    <nav class="sidebar">
+      <ul>
+        <li><a href="#" class="nav-link-cli is-active" data-view-cli="dashboard"><span class="nav-ico">▣</span>Início</a></li>
+        <li><a href="#" class="nav-link-cli" data-view-cli="veiculos"><span class="nav-ico">🚗</span>Meus veículos</a></li>
+        <li><a href="#" class="nav-link-cli" data-view-cli="solicitacoes"><span class="nav-ico">▤</span>Solicitações</a></li>
+        <li><a href="#" class="nav-link-cli" data-view-cli="orcamentos"><span class="nav-ico">▦</span>Meus orçamentos</a></li>
+        <li><a href="#" class="nav-link-cli" data-view-cli="servicos"><span class="nav-ico">🔧</span>Serviços</a></li>
+        <li><a href="#" class="nav-link-cli" data-view-cli="perfil"><span class="nav-ico">☺</span>Meu perfil</a></li>
+      </ul>
+      <div class="sidebar__foot">
+        <p>Conectado à plataforma</p>
+        <strong>LaunchControl</strong>
+      </div>
+    </nav>
+
+    <main class="content">
+
+      <section id="viewcli-dashboard" class="view is-active">
+        <div class="view-head">
+          <div>
+            <h1>Olá, <span id="cliNomeSaudacao">João</span> 👋</h1>
+            <p class="subtitle">Aqui está um resumo do que está acontecendo com o seu veículo.</p>
+          </div>
+        </div>
+        <div class="cards-grid" id="cliKpiCards"></div>
+        <div class="panel">
+          <div class="panel__head">
+            <h2>Últimas solicitações</h2>
+            <a href="#" class="link-more-cli" data-view-cli="solicitacoes">Ver todas →</a>
+          </div>
+          <div class="req-list" id="cliRecentRequests"></div>
+        </div>
+      </section>
+
+      <section id="viewcli-veiculos" class="view">
+        <div class="view-head"><div><h1>Meus veículos</h1><p class="subtitle">Veículos cadastrados na sua conta.</p></div></div>
+        <div class="cards-grid" id="cliVeiculosCards"></div>
+      </section>
+
+      <section id="viewcli-solicitacoes" class="view">
+        <div class="view-head"><div><h1>Solicitações</h1><p class="subtitle">Pedidos que você enviou à oficina.</p></div></div>
+        <div class="panel">
+          <div class="req-list" id="cliAllRequests"></div>
+        </div>
+      </section>
+
+      <section id="viewcli-orcamentos" class="view">
+        <div class="view-head"><div><h1>Meus orçamentos</h1><p class="subtitle">Clique em um orçamento para ver os itens e responder à oficina.</p></div></div>
+        <div class="panel">
+          <table class="data-table" id="cliOrcamentosTable">
+            <thead><tr><th>Veículo</th><th>Serviço</th><th>Valor total</th><th>Status</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="viewcli-servicos" class="view">
+        <div class="view-head"><div><h1>Serviços</h1><p class="subtitle">Serviços em andamento e concluídos.</p></div></div>
+        <div class="panel">
+          <table class="data-table" id="cliServicosTable">
+            <thead><tr><th>Veículo</th><th>Serviço</th><th>Entrada</th><th>Previsão</th><th>Status</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="viewcli-perfil" class="view">
+        <div class="view-head"><div><h1>Meu perfil</h1><p class="subtitle">Seus dados cadastrados na plataforma LaunchControl.</p></div></div>
+        <div class="panel">
+          <div class="detail-grid" id="cliPerfilInfo"></div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- ============ MODAL: DETALHES DA SOLICITAÇÃO (oficina) ============ -->
 <div class="modal-overlay" id="modalDetalhe">
   <div class="modal modal--wide">
     <div class="modal__head">
       <h2>Detalhes da solicitação</h2>
       <button class="icon-btn" id="closeDetalhe">✕</button>
     </div>
-    <div class="modal__body" id="detalheBody">
-      <!-- preenchido via JS -->
-    </div>
+    <div class="modal__body" id="detalheBody"></div>
   </div>
 </div>
 
-<!-- ============ MODAL: ELABORAR ORÇAMENTO ============ -->
+<!-- ============ MODAL: DETALHES DA SOLICITAÇÃO (cliente, somente leitura) ============ -->
+<div class="modal-overlay" id="modalDetalheCli">
+  <div class="modal modal--wide">
+    <div class="modal__head">
+      <h2>Detalhes da solicitação</h2>
+      <button class="icon-btn" id="closeDetalheCli">✕</button>
+    </div>
+    <div class="modal__body" id="detalheCliBody"></div>
+  </div>
+</div>
+
+<!-- ============ MODAL: ELABORAR / EDITAR ORÇAMENTO (oficina) ============ -->
 <div class="modal-overlay" id="modalOrcamento">
   <div class="modal modal--wide">
     <div class="modal__head">
-      <h2>Elaborar orçamento</h2>
+      <h2 id="orcModalTitulo">Elaborar orçamento</h2>
       <button class="icon-btn" id="closeOrcamento">✕</button>
     </div>
     <form class="modal__body" id="formOrcamento">
@@ -197,27 +555,38 @@
         </label>
       </div>
 
-      <div class="form-row">
-        <label>Peças utilizadas
-          <input type="text" id="orcPecas" placeholder="Ex: Pastilhas dianteiras">
-        </label>
+      <!-- ---- PEÇAS (itemizado) ---- -->
+      <div class="items-section">
+        <div class="items-section__head">
+          <h3>Peças</h3>
+          <button type="button" class="btn btn--outline btn--small" id="btnAddPeca">+ Adicionar peça</button>
+        </div>
+        <div class="item-rows item-rows--pecas" id="orcPecasList"></div>
+        <div class="subtotal-row">
+          <span>Subtotal das peças</span>
+          <strong id="orcSubtotalPecas">R$ 0,00</strong>
+        </div>
       </div>
 
-      <div class="form-grid">
-        <label>Valor das peças (R$)
-          <input type="number" id="orcValorPecas" min="0" step="0.01" value="0" required>
-        </label>
-        <label>Mão de obra (R$)
-          <input type="number" id="orcMaoDeObra" min="0" step="0.01" value="0" required>
-        </label>
+      <!-- ---- MÃO DE OBRA (itemizado) ---- -->
+      <div class="items-section">
+        <div class="items-section__head">
+          <h3>Mão de obra</h3>
+          <button type="button" class="btn btn--outline btn--small" id="btnAddMaoObra">+ Adicionar mão de obra</button>
+        </div>
+        <div class="item-rows item-rows--maoobra" id="orcMaoObraList"></div>
+        <div class="subtotal-row">
+          <span>Subtotal da mão de obra</span>
+          <strong id="orcSubtotalMaoObra">R$ 0,00</strong>
+        </div>
+      </div>
+
+      <div class="form-grid form-grid--2">
         <label>Prazo estimado
           <input type="text" id="orcPrazo" placeholder="Ex: 2 horas" required>
         </label>
-      </div>
-
-      <div class="form-row">
         <label>Observações
-          <textarea id="orcObs" rows="2" placeholder="Informações adicionais para o cliente"></textarea>
+          <textarea id="orcObs" rows="1" placeholder="Informações adicionais para o cliente"></textarea>
         </label>
       </div>
 
@@ -231,6 +600,28 @@
         <button type="submit" class="btn btn--primary">Enviar orçamento ao cliente</button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- ============ MODAL: DETALHE DO ORÇAMENTO (oficina, somente leitura + editar) ============ -->
+<div class="modal-overlay" id="modalOrcamentoDetalheOficina">
+  <div class="modal modal--wide">
+    <div class="modal__head">
+      <h2>Detalhes do orçamento</h2>
+      <button class="icon-btn" id="closeOrcamentoDetalheOficina">✕</button>
+    </div>
+    <div class="modal__body" id="orcamentoDetalheOficinaBody"></div>
+  </div>
+</div>
+
+<!-- ============ MODAL: ORÇAMENTO DETALHADO (cliente — aprovar/recusar) ============ -->
+<div class="modal-overlay" id="modalOrcamentoCliente">
+  <div class="modal modal--wide">
+    <div class="modal__head">
+      <h2>Orçamento detalhado</h2>
+      <button class="icon-btn" id="closeOrcamentoCliente">✕</button>
+    </div>
+    <div class="modal__body" id="orcamentoClienteBody"></div>
   </div>
 </div>
 
