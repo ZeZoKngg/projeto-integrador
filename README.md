@@ -4,6 +4,7 @@
 
 ## 👥 Equipe
 
+- **Ana Letícia** ([@Anapimentel18](https://github.com/Anapimentel18))
 - **Gabriel Teodoro** ([@GabrielTeodoro7](https://github.com/GabrielTeodoro7))
 - **Miguel Luiz** ([@ZeZoKngg](https://github.com/ZeZoKngg))
 
