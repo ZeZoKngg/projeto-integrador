@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 
+/** Controlador REST responsável pelos endpoints da API do LaunchControl. */
 @RestController
 @RequestMapping("/api")
 class ApiController {
@@ -181,6 +182,7 @@ class ApiController {
         notificacoes.save(new Notificacao(u, t, m));
     }
 
+    /** GET /me: Retorna os dados básicos do usuário autenticado. */
     @GetMapping("/me")
     Map<String, Object> me(Authentication a) {
         Usuario u = atual(a);
@@ -192,6 +194,7 @@ class ApiController {
         );
     }
 
+    /** POST /public/cadastro: Cadastra um novo usuário e protege a criação de administradores. */
     @PostMapping("/public/cadastro")
     ResponseEntity<?> cadastro(
         @Valid @RequestBody Cadastro in
@@ -230,6 +233,7 @@ class ApiController {
         );
     }
 
+    /** POST /public/recuperar-senha: Solicita o envio das instruções de recuperação de senha. */
     @PostMapping("/public/recuperar-senha")
     Map<String, String> recuperarSenha(
         @Valid @RequestBody RecuperarSenhaIn in
@@ -242,6 +246,7 @@ class ApiController {
         );
     }
 
+    /** POST /public/redefinir-senha: Redefine a senha mediante token de recuperação. */
     @PostMapping("/public/redefinir-senha")
     Map<String, String> redefinirSenha(
         @Valid @RequestBody RedefinirSenhaIn in
@@ -257,6 +262,7 @@ class ApiController {
         );
     }
 
+    /** GET /public/status: Disponibiliza uma verificação simples de funcionamento da API. */
     @GetMapping("/public/status")
     Map<String, String> status() {
         return Map.of(
@@ -265,6 +271,7 @@ class ApiController {
         );
     }
 
+    /** GET /veiculos: Lista ou cadastra veículos do cliente, conforme o método HTTP. */
     @GetMapping("/veiculos")
     List<Map<String, Object>> meusVeiculos(Authentication a) {
         Usuario u = atual(a);
@@ -283,6 +290,7 @@ class ApiController {
             .toList();
     }
 
+    /** POST /veiculos: Lista ou cadastra veículos do cliente, conforme o método HTTP. */
     @PostMapping("/veiculos")
     @Transactional
     ResponseEntity<?> criarVeiculo(
@@ -325,6 +333,7 @@ class ApiController {
         );
     }
 
+    /** PUT /veiculos/{id}: Edita ou exclui um veículo após validar sua propriedade. */
     @PutMapping("/veiculos/{id}")
     @Transactional
     Map<String, Object> editarVeiculo(
@@ -359,6 +368,7 @@ class ApiController {
         );
     }
 
+    /** DELETE /veiculos/{id}: Edita ou exclui um veículo após validar sua propriedade. */
     @DeleteMapping("/veiculos/{id}")
     @Transactional
     void excluirVeiculo(
@@ -388,6 +398,7 @@ class ApiController {
         veiculos.delete(v);
     }
 
+    /** GET /oficinas: Lista os usuários cadastrados com perfil de oficina. */
     @GetMapping("/oficinas")
     List<Map<String, Object>> oficinas(Authentication a) {
         atual(a);
@@ -403,6 +414,7 @@ class ApiController {
             .toList();
     }
 
+    /** GET /solicitacoes: Lista ou cria solicitações de serviço, conforme o método HTTP. */
     @GetMapping("/solicitacoes")
     List<Map<String, Object>> listar(Authentication a) {
         Usuario u = atual(a);
@@ -417,6 +429,7 @@ class ApiController {
         return lista.stream().map(this::dto).toList();
     }
 
+    /** POST /solicitacoes: Lista ou cria solicitações de serviço, conforme o método HTTP. */
     @PostMapping("/solicitacoes")
     @Transactional
     ResponseEntity<?> criarSolicitacao(
@@ -493,6 +506,7 @@ class ApiController {
         return ResponseEntity.status(201).body(dto(s));
     }
 
+    /** GET /solicitacoes/{id}: Consulta uma solicitação e verifica a autorização do usuário. */
     @GetMapping("/solicitacoes/{id}")
     Map<String, Object> detalhe(
         @PathVariable Long id,
@@ -517,6 +531,7 @@ class ApiController {
         }
     }
 
+    /** POST /solicitacoes/{id}/orcamento: Registra ou atualiza a proposta de orçamento da oficina. */
     @PostMapping("/solicitacoes/{id}/orcamento")
     @Transactional
     Map<String, Object> orcar(
@@ -595,6 +610,7 @@ class ApiController {
         return dto(s);
     }
 
+    /** POST /solicitacoes/{id}/decisao: Registra a aprovação ou recusa do orçamento pelo cliente. */
     @PostMapping("/solicitacoes/{id}/decisao")
     @Transactional
     Map<String, Object> decidir(
@@ -647,6 +663,7 @@ class ApiController {
         return dto(s);
     }
 
+    /** PUT /solicitacoes/{id}/status: Atualiza o andamento do serviço e exige laudo na conclusão. */
     @PutMapping("/solicitacoes/{id}/status")
     @Transactional
     Map<String, Object> atualizar(
@@ -714,6 +731,7 @@ class ApiController {
         return dto(s);
     }
 
+    /** GET /notificacoes: Lista as notificações do usuário autenticado. */
     @GetMapping("/notificacoes")
     List<Map<String, Object>> minhasNotificacoes(Authentication a) {
         return notificacoes
@@ -729,6 +747,7 @@ class ApiController {
             .toList();
     }
 
+    /** PUT /notificacoes/{id}/lida: Marca uma notificação como lida. */
     @PutMapping("/notificacoes/{id}/lida")
     void ler(
         @PathVariable Long id,
@@ -749,6 +768,7 @@ class ApiController {
         notificacoes.save(n);
     }
 
+    /** POST /solicitacoes/{id}/avaliacao: Registra a avaliação de um atendimento concluído. */
     @PostMapping("/solicitacoes/{id}/avaliacao")
     @Transactional
     ResponseEntity<?> avaliar(
@@ -788,6 +808,7 @@ class ApiController {
         );
     }
 
+    /** GET /cobrancas: Lista as cobranças acessíveis ao usuário autenticado. */
     @GetMapping("/cobrancas")
     List<Map<String, Object>> listarCobrancas(Authentication a) {
         Usuario u = atual(a);
@@ -819,6 +840,7 @@ class ApiController {
         );
     }
 
+    /** PUT /cobrancas/{id}/status: Atualiza o status de pagamento de uma cobrança. */
     @PutMapping("/cobrancas/{id}/status")
     @Transactional
     Map<String, Object> atualizarCobranca(
@@ -867,6 +889,7 @@ class ApiController {
         return cobrancaDto(c);
     }
 
+    /** GET /pecas: Lista ou cadastra peças, conforme o método HTTP e o perfil. */
     @GetMapping("/pecas")
     List<Map<String, Object>> listarPecas(Authentication a) {
         Usuario u = atual(a);
@@ -896,6 +919,7 @@ class ApiController {
             .toList();
     }
 
+    /** POST /pecas: Lista ou cadastra peças, conforme o método HTTP e o perfil. */
     @PostMapping("/pecas")
     ResponseEntity<?> cadastrarPeca(
         @Valid @RequestBody PecaIn in,
@@ -935,6 +959,7 @@ class ApiController {
         );
     }
 
+    /** PUT /pecas/{id}: Atualiza preço e quantidade de uma peça do fornecedor. */
     @PutMapping("/pecas/{id}")
     @Transactional
     Map<String, Object> editarPeca(
@@ -965,6 +990,7 @@ class ApiController {
         );
     }
 
+    /** GET /solicitacoes/{id}/historico-orcamento: Consulta o histórico de alterações de orçamento. */
     @GetMapping("/solicitacoes/{id}/historico-orcamento")
     List<Map<String, Object>> historico(
         @PathVariable Long id,
@@ -989,6 +1015,7 @@ class ApiController {
             .orElse(List.of());
     }
 
+    /** GET /oficinas/{id}/avaliacoes: Lista avaliações recebidas por uma oficina. */
     @GetMapping("/oficinas/{id}/avaliacoes")
     List<Map<String, Object>> avaliacoesOficina(
         @PathVariable Long id,
@@ -1007,6 +1034,7 @@ class ApiController {
             .toList();
     }
 
+    /** GET /solicitacoes/{id}/mensagens: Lista ou envia mensagens vinculadas ao atendimento. */
     @GetMapping("/solicitacoes/{id}/mensagens")
     List<Map<String, Object>> mensagens(
         @PathVariable Long id,
@@ -1028,6 +1056,7 @@ class ApiController {
             .toList();
     }
 
+    /** POST /solicitacoes/{id}/mensagens: Lista ou envia mensagens vinculadas ao atendimento. */
     @PostMapping("/solicitacoes/{id}/mensagens")
     @Transactional
     ResponseEntity<?> enviarMensagem(
@@ -1080,6 +1109,7 @@ class ApiController {
         );
     }
 
+    /** GET /solicitacoes/{id}/anexos: Lista ou adiciona arquivos anexados ao atendimento. */
     @GetMapping("/solicitacoes/{id}/anexos")
     List<Map<String, Object>> listarAnexos(
         @PathVariable Long id,
@@ -1100,6 +1130,7 @@ class ApiController {
             .toList();
     }
 
+    /** POST /solicitacoes/{id}/anexos: Lista ou adiciona arquivos anexados ao atendimento. */
     @PostMapping("/solicitacoes/{id}/anexos")
     @Transactional
     ResponseEntity<?> adicionarAnexo(
@@ -1197,6 +1228,7 @@ class ApiController {
         );
     }
 
+    /** GET /solicitacoes/{id}/anexos/{anexoId}: Obtém o conteúdo de um anexo autorizado. */
     @GetMapping("/solicitacoes/{id}/anexos/{anexoId}")
     ResponseEntity<byte[]> baixarAnexo(
         @PathVariable Long id,
@@ -1224,6 +1256,7 @@ class ApiController {
             .body(x.conteudo);
     }
 
+    /** GET /solicitacoes/{id}/diario: Lista ou registra atualizações do diário de manutenção. */
     @GetMapping("/solicitacoes/{id}/diario")
     List<Map<String, Object>> listarDiario(
         @PathVariable Long id,
@@ -1243,6 +1276,7 @@ class ApiController {
             .toList();
     }
 
+    /** POST /solicitacoes/{id}/diario: Lista ou registra atualizações do diário de manutenção. */
     @PostMapping("/solicitacoes/{id}/diario")
     @Transactional
     ResponseEntity<?> adicionarDiario(
@@ -1292,6 +1326,7 @@ class ApiController {
         );
     }
 
+    /** GET /admin/usuarios: Lista usuários para o perfil administrador. */
     @GetMapping("/admin/usuarios")
     List<Map<String, Object>> usuariosAdmin(Authentication a) {
         perfil(atual(a), Perfil.ADMINISTRADOR);
@@ -1307,6 +1342,7 @@ class ApiController {
             .toList();
     }
 
+    /** GET /oficina/indicadores: Calcula indicadores de solicitações da oficina. */
     @GetMapping("/oficina/indicadores")
     Map<String, Object> indicadores(Authentication a) {
         Usuario o = atual(a);
@@ -1387,4 +1423,3 @@ class ApiController {
         return m;
     }
 }
-
