@@ -1,6 +1,22 @@
 
+
+/**
+
+  A aplicação utiliza JavaScript para renderizar as telas e consumir a API
+ REST do backend Spring Boot. O HTML funciona como ponto de entrada,
+ enquanto o CSS concentra as regras de apresentação visual.
+ 
+ Decisão de arquitetura: manter a comunicação com o servidor centralizada
+ e reutilizar funções de renderização reduz a repetição de código.
+ */
 "use strict";
 
+/**
+ * Define o endereço da API conforme o ambiente de execução.
+ * Em execução local, as requisições são direcionadas à porta 8080;
+ * quando o frontend é servido pelo próprio backend, usa a mesma origem.
+ * Atenção: a configuração deve ser revisada antes de publicar em produção.
+ */
 const API_ORIGIN =
   location.port === "8080" ||
   location.protocol === "file:" ||
@@ -9,13 +25,23 @@ const API_ORIGIN =
     ? "http://localhost:8080"
     : "";
 
+// O elemento #app recebe as telas renderizadas dinamicamente pelo JavaScript.
 const app = document.querySelector("#app");
 
+/**
+ * Estado temporário da interface: credenciais da sessão, usuário autenticado,
+ * módulo selecionado e mensagens de retorno das operações.
+ * As credenciais permanecem em memória e são descartadas ao sair da aplicação.
+ */
 let auth = null;
 let me = null;
 let tab = "dashboard";
 let msg = "";
 
+/**
+ * Cache dos dados exibidos nas telas. As coleções são preenchidas pela API;
+ * este objeto não substitui a persistência realizada no banco de dados.
+ */
 let data = {
   solicitacoes: [],
   veiculos: [],
@@ -26,6 +52,10 @@ let data = {
   cobrancas: []
 };
 
+/**
+ * Escapa caracteres especiais antes de inserir valores em templates HTML.
+ * Essa proteção é importante para reduzir riscos de injeção de HTML.
+ */
 const esc = value =>
   String(value ?? "").replace(/[&<>"']/g, char => ({
     "&": "&amp;",
@@ -35,12 +65,14 @@ const esc = value =>
     "'": "&#39;"
   }[char]));
 
+// Padroniza valores monetários no formato brasileiro (BRL).
 const money = value =>
   Number(value || 0).toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL"
   });
 
+// Traduz os códigos de status retornados pelo backend para a interface.
 const statuses = {
   AGUARDANDO: "Aguardando",
   EM_ANALISE: "Em análise",
@@ -55,6 +87,14 @@ const statuses = {
    COMUNICAÇÃO COM O BACKEND
    ========================================== */
 
+/**
+ * Centraliza as requisições HTTP ao backend Spring Boot.
+ * Adiciona autenticação Basic quando existe uma sessão e converte corpos
+ * JSON e respostas de erro para um formato reutilizável pela interface.
+ *
+ * Observação: HTTP Basic deve ser utilizado com HTTPS fora do ambiente local;
+ * Base64 não representa criptografia de senha.
+ */
 async function api(path, method = "GET", body) {
   const response = await fetch(API_ORIGIN + "/api" + path, {
     method,
@@ -86,6 +126,7 @@ async function api(path, method = "GET", body) {
   return text ? JSON.parse(text) : null;
 }
 
+// Prepara uma mensagem de sucesso ou erro para o próximo render da tela.
 function flash(text, error = false) {
   msg = `
     <div class="notice ${error ? "error" : "ok"}">
@@ -98,6 +139,11 @@ function flash(text, error = false) {
    LOGIN E CADASTRO PREMIUM
    ========================================== */
 
+/**
+ * Renderiza login e cadastro na mesma estrutura visual.
+ * A opção register altera campos e textos sem duplicar duas páginas inteiras.
+ * Os eventos do formulário são associados após a inserção do HTML.
+ */
 function loginScreen(register = false) {
   const heading = register
     ? "Crie sua conta"
@@ -349,6 +395,11 @@ function loginScreen(register = false) {
    RECUPERAÇÃO DE SENHA
    ========================================== */
 
+/**
+ * Exibe a solicitação de recuperação de senha.
+ * O envio depende do endpoint público correspondente e da configuração
+ * de e-mail do backend; esta tela, isoladamente, não redefine a senha.
+ */
 function recoveryScreen() {
   app.innerHTML = `
     <main class="login lc-auth-page">
@@ -468,6 +519,12 @@ function recoveryScreen() {
    CARREGAMENTO DOS DADOS
    ========================================== */
 
+/**
+ * Atualiza os dados consultados pela aplicação.
+ * As chamadas condicionadas ao perfil evitam solicitar recursos que não
+ * fazem parte da navegação daquele usuário. A autorização real deve
+ * continuar sendo validada no backend, nunca apenas no frontend.
+ */
 async function refresh() {
   data.solicitacoes = await api("/solicitacoes");
   data.notificacoes = await api("/notificacoes");
@@ -499,6 +556,11 @@ async function refresh() {
    NAVEGAÇÃO
    ========================================== */
 
+/**
+ * Define os módulos disponíveis no menu para cada perfil.
+ * A filtragem melhora a experiência de uso, mas não substitui
+ * as regras de acesso implementadas pelo Spring Security.
+ */
 function tabs() {
   return [
     { id: "dashboard", label: "▦ Painel" },
@@ -535,6 +597,10 @@ function tabs() {
    LAYOUT PRINCIPAL
    ========================================== */
 
+/**
+ * Monta o layout autenticado, com menu lateral, cabeçalho e conteúdo ativo.
+ * Após atualizar o DOM, registra os eventos de navegação e formulários.
+ */
 function render() {
   app.innerHTML = `
     <div class="layout">
@@ -608,6 +674,7 @@ function render() {
    COMPONENTES REUTILIZÁVEIS
    ========================================== */
 
+// Componente reutilizável para indicadores do painel principal.
 function card(label, value) {
   return `
     <div class="card">
@@ -617,6 +684,7 @@ function card(label, value) {
   `;
 }
 
+// Gera tabelas consistentes e uma mensagem quando não há registros.
 function table(headers, rows) {
   if (!rows.length) {
     return `
@@ -649,6 +717,7 @@ function table(headers, rows) {
   `;
 }
 
+// Padroniza a estrutura de formulários usados nos diferentes módulos.
 function form(id, fields, label) {
   return `
     <form data-form="${id}">
@@ -664,6 +733,11 @@ function form(id, fields, label) {
    AÇÕES DAS SOLICITAÇÕES
    ========================================== */
 
+/**
+ * Seleciona ações possíveis conforme perfil e estado da solicitação.
+ * Exemplo: a oficina prepara orçamentos e o cliente aprova ou recusa.
+ * O backend precisa validar cada transição independentemente dos botões.
+ */
 function actions(item) {
   if (me.perfil === "OFICINA") {
     if (
@@ -742,6 +816,7 @@ function actions(item) {
   return "—";
 }
 
+// Renderiza solicitações, seus orçamentos, status e ações disponíveis.
 function requests(items) {
   if (!items.length) {
     return `
@@ -820,6 +895,11 @@ function requests(items) {
    CONTEÚDO DOS MÓDULOS
    ========================================== */
 
+/**
+ * Retorna o conteúdo do módulo atualmente selecionado.
+ * O painel apresenta indicadores; os demais módulos oferecem cadastros,
+ * consultas, pesquisa externa de peças, cobranças e notificações.
+ */
 function content() {
   const solicitacoes = data.solicitacoes;
 
@@ -1343,6 +1423,10 @@ function content() {
    EXECUÇÃO DE OPERAÇÕES
    ========================================== */
 
+/**
+ * Executa uma operação de escrita, recarrega os dados e atualiza a tela.
+ * Centralizar esse fluxo evita repetir o tratamento de sucesso e erro.
+ */
 async function execute(path, method, body, success) {
   try {
     await api(path, method, body);
@@ -1359,6 +1443,11 @@ async function execute(path, method, body, success) {
    EVENTOS E FORMULÁRIOS
    ========================================== */
 
+/**
+ * Conecta os botões e formulários renderizados aos respectivos eventos.
+ * Como a interface é recriada dinamicamente, os eventos são registrados
+ * novamente após cada renderização.
+ */
 function bind() {
   const searchForm = document.querySelector("#parts-search");
 
@@ -1601,6 +1690,11 @@ function bind() {
    ORÇAMENTO
    ========================================== */
 
+/**
+ * Exibe o formulário de orçamento para uma solicitação específica.
+ * Converte valores numéricos antes de enviá-los à API; a validação final
+ * e o cálculo confiável dos totais devem ocorrer no backend.
+ */
 function quote(id) {
   document.querySelector(".content").innerHTML = `
     <div class="heading">
@@ -1719,6 +1813,11 @@ function quote(id) {
    DETALHES DO ATENDIMENTO
    ========================================== */
 
+/**
+ * Carrega a visão detalhada do atendimento: orçamento, histórico,
+ * diário de manutenção, anexos e mensagens entre cliente e oficina.
+ * Os dados são buscados pelos endpoints específicos da solicitação.
+ */
 async function detail(id) {
   try {
     const item = await api("/solicitacoes/" + id);
@@ -2131,6 +2230,7 @@ async function detail(id) {
    AVALIAÇÃO DE SERVIÇOS
    ========================================== */
 
+// Exibe a avaliação de um serviço concluído, com nota e comentário.
 function review(id) {
   document.querySelector(".content").innerHTML = `
     <h1>Avaliar serviço #${esc(id)}</h1>
@@ -2192,4 +2292,5 @@ function review(id) {
    INICIALIZAÇÃO
    ========================================== */
 
+// Inicializa a aplicação na tela de autenticação.
 loginScreen();
