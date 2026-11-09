@@ -1,0 +1,65 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <!--
+        PROJETO: LaunchControl
+        Sistema de Gestão para Oficinas Automotivas
+
+        Estrutura principal do frontend.
+
+        O HTML foi mantido simples porque as telas
+        e funcionalidades do sistema são carregadas
+        dinamicamente pelo JavaScript.
+    -->
+
+    <meta charset="UTF-8">
+
+    <!--
+        Permite que a interface se adapte
+        a computadores, tablets e celulares.
+    -->
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <!-- Título exibido na aba do navegador -->
+    <title>LaunchControl | Gestão Automotiva</title>
+
+    <!--
+        Arquivo responsável pela aparência do sistema,
+        incluindo cores, formulários e responsividade.
+    -->
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <!--
+        ELEMENTO PRINCIPAL DA APLICAÇÃO
+
+        O JavaScript utiliza o identificador "app"
+        para apresentar as telas do LaunchControl.
+
+        Login, cadastro, dashboard, solicitações,
+        veículos, orçamentos e demais funcionalidades
+        são renderizados dentro deste elemento.
+
+        Essa estrutura permite navegar entre as telas
+        sem criar um arquivo HTML para cada página.
+    -->
+    <div id="app"></div>
+
+    <!--
+        JAVASCRIPT PRINCIPAL
+
+        Responsável pela comunicação com o backend,
+        autenticação, navegação e gerenciamento
+        das funcionalidades da interface.
+
+        O atributo defer permite carregar o script
+        sem bloquear o processamento do HTML.
+    -->
+    <script src="./app.js" defer></script>
+</body>
+</html>

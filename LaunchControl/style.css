@@ -1,9 +1,3 @@
-
-/* ==========================================
-   LAUNCHCONTROL
-   ESTILOS GERAIS DO SISTEMA
-   ========================================== */
-
 /* Importa a fonte utilizada na interface. */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
@@ -735,4 +729,51 @@ td button {
   .lc-brand .logo {
     font-size: 22px;
   }
+}
+
+/* ==========================================
+   CENTRALIZAÇÃO DAS TELAS DE AUTENTICAÇÃO
+   ========================================== */
+
+/* Centraliza o cartão na área visível da página. */
+.login.lc-auth-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Centraliza a identidade visual e os textos do cartão. */
+.auth.lc-auth-card {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.lc-brand,
+.lc-auth-heading {
+  text-align: center;
+}
+
+/* Mantém o formulário com a largura do cartão. */
+.lc-auth-form {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Rótulos e conteúdo dos campos continuam fáceis de ler. */
+.lc-auth-form .field,
+.lc-auth-form input,
+.lc-auth-form select,
+.lc-auth-form textarea {
+  text-align: left;
+}
+
+/* Mantém o rodapé centralizado. */
+.lc-auth-footer,
+.lc-auth-bottom {
+  text-align: center;
 }
