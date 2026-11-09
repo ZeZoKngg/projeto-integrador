@@ -1,22 +1,462 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');:root{font-family:Inter,Arial,sans-serif;color:#1e2531;background:#f4f5f8}*{box-sizing:border-box}body{margin:0}button,input,select,textarea{font:inherit}button{cursor:pointer}.login{min-height:100vh;background:#111827;display:grid;place-items:center;padding:20px}.auth{background:white;padding:34px;border-radius:18px;width:min(470px,100%);box-shadow:0 25px 70px #0006}.logo{font-size:25px;font-weight:800;color:#f97316}.logo span{color:#fff}.auth .logo span{color:#222}.muted{color:#7c8492;font-size:13px}.auth h1{font-size:22px}.field{display:grid;gap:7px;margin:13px 0;font-size:13px;font-weight:600}input,select,textarea{padding:12px;border:1px solid #d8dce4;border-radius:9px;background:white;width:100%;color:#202635}textarea{min-height:85px}.btn{border:0;background:#f97316;color:white;border-radius:9px;padding:11px 17px;font-weight:700}.btn:hover{background:#ea580c}.btn.secondary{background:#e9ebf0;color:#242936}.btn.danger{background:#b91c1c}.link{background:none;border:0;color:#ea580c;font-weight:700}.layout{display:flex;min-height:100vh}.sidebar{background:#151b26;color:#cbd2dd;width:245px;min-width:245px;padding:25px 14px}.sidebar .logo{padding:0 13px 28px}.nav{display:block;border:0;background:none;color:#b6bfcd;padding:13px 15px;width:100%;text-align:left;border-radius:10px;margin-bottom:4px}.nav:hover,.nav.active{background:#f97316;color:#fff}.main{flex:1;min-width:0}.top{display:flex;justify-content:space-between;align-items:center;background:white;padding:20px 30px;border-bottom:1px solid #e6e8ed;gap:12px}.content{padding:26px 30px;max-width:1400px;margin:auto}.heading{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.heading h1{font-size:25px;margin:4px 0 18px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin-bottom:22px}.card,.panel{background:white;border:1px solid #e7e9ef;border-radius:13px;padding:21px;box-shadow:0 2px 7px #1e293b08}.card strong{display:block;font-size:29px;margin-top:12px;color:#f97316}.panel{margin-bottom:18px;overflow:auto}.panel h2{font-size:17px;margin:0 0 16px}table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:13px 10px;text-align:left;border-bottom:1px solid #edf0f4}th{color:#687386}td button{margin:2px}.pill{border-radius:99px;background:#fff1e7;color:#b45309;padding:5px 9px;font-size:11px;font-weight:700;white-space:nowrap}.empty{padding:28px;text-align:center;color:#7d8490}.formgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:0 16px}.notice{padding:12px;border-radius:9px;margin:10px 0;background:#fef3c7;color:#78350f}.notice.error{background:#fee2e2;color:#991b1b}.notice.ok{background:#dcfce7;color:#166534}.actions{display:flex;gap:8px;flex-wrap:wrap}.hidden{display:none!important}@media(max-width:760px){.layout{display:block}.sidebar{width:100%;padding:12px;display:flex;gap:5px;overflow:auto;align-items:center}.sidebar .logo{padding:5px 10px;font-size:18px}.nav{white-space:nowrap;width:auto;margin:0}.top,.content{padding:16px}.top{flex-wrap:wrap}}
-/* Ajuste do logo LaunchControl na barra lateral */
-.sidebar {
-    box-sizing: border-box;
+
+/* ==========================================
+   LAUNCHCONTROL
+   ESTILOS GERAIS DO SISTEMA
+   ========================================== */
+
+/* Importa a fonte utilizada na interface. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* Configurações gerais de fonte, cor e fundo. */
+:root {
+  font-family: Inter, Arial, sans-serif;
+  color: #1e2531;
+  background: #f4f5f8;
 }
 
+/* Padroniza o cálculo de tamanho dos elementos. */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+/* Faz os controles utilizarem a fonte do sistema. */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* ==========================================
+   LOGIN - ESTRUTURA ORIGINAL
+   ========================================== */
+
+/* Centraliza o formulário de autenticação na tela. */
+.login {
+  min-height: 100vh;
+  background: #111827;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+/* Define o cartão de autenticação. */
+.auth {
+  background: white;
+  padding: 34px;
+  border-radius: 18px;
+  width: min(470px, 100%);
+  box-shadow: 0 25px 70px #0006;
+}
+
+/* ==========================================
+   IDENTIDADE VISUAL
+   ========================================== */
+
+/* Logo principal do LaunchControl. */
+.logo {
+  font-size: 25px;
+  font-weight: 800;
+  color: #f97316;
+}
+
+.logo span {
+  color: #fff;
+}
+
+/* Ajusta a segunda parte do logo na tela de login. */
+.auth .logo span {
+  color: #222;
+}
+
+/* Textos auxiliares utilizados no sistema. */
+.muted {
+  color: #7c8492;
+  font-size: 13px;
+}
+
+.auth h1 {
+  font-size: 22px;
+}
+
+/* ==========================================
+   FORMULÁRIOS
+   ========================================== */
+
+/* Organiza os rótulos e campos de entrada. */
+.field {
+  display: grid;
+  gap: 7px;
+  margin: 13px 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Estilo padrão dos campos de formulário. */
+input,
+select,
+textarea {
+  padding: 12px;
+  border: 1px solid #d8dce4;
+  border-radius: 9px;
+  background: white;
+  width: 100%;
+  color: #202635;
+}
+
+/* Altura mínima dos campos de texto maiores. */
+textarea {
+  min-height: 85px;
+}
+
+/* ==========================================
+   BOTÕES
+   ========================================== */
+
+/* Botão principal utilizado nas ações do sistema. */
+.btn {
+  border: 0;
+  background: #f97316;
+  color: white;
+  border-radius: 9px;
+  padding: 11px 17px;
+  font-weight: 700;
+}
+
+/* Efeito ao posicionar o cursor sobre o botão. */
+.btn:hover {
+  background: #ea580c;
+}
+
+/* Botão secundário para ações alternativas. */
+.btn.secondary {
+  background: #e9ebf0;
+  color: #242936;
+}
+
+/* Botão de ações que exigem atenção, como exclusões. */
+.btn.danger {
+  background: #b91c1c;
+}
+
+/* Botões com aparência de link. */
+.link {
+  background: none;
+  border: 0;
+  color: #ea580c;
+  font-weight: 700;
+}
+
+/* ==========================================
+   ESTRUTURA PRINCIPAL
+   ========================================== */
+
+/* Divide a interface entre menu lateral e conteúdo. */
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ==========================================
+   MENU LATERAL
+   ========================================== */
+
+/* Define o tamanho e a aparência da barra lateral. */
+.sidebar {
+  background: #151b26;
+  color: #cbd2dd;
+  width: 245px;
+  min-width: 245px;
+  padding: 25px 14px;
+}
+
+/* Posiciona o logo dentro do menu. */
+.sidebar .logo {
+  padding: 0 13px 28px;
+}
+
+/* Estilo padrão dos itens de navegação. */
+.nav {
+  display: block;
+  border: 0;
+  background: none;
+  color: #b6bfcd;
+  padding: 13px 15px;
+  width: 100%;
+  text-align: left;
+  border-radius: 10px;
+  margin-bottom: 4px;
+}
+
+/* Destaca a página selecionada e o item sob o cursor. */
+.nav:hover,
+.nav.active {
+  background: #f97316;
+  color: #fff;
+}
+
+/* ==========================================
+   ÁREA PRINCIPAL
+   ========================================== */
+
+/* Ocupa o espaço disponível ao lado do menu. */
+.main {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Cabeçalho com informações do usuário e botão de saída. */
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 20px 30px;
+  border-bottom: 1px solid #e6e8ed;
+  gap: 12px;
+}
+
+/* Área onde são exibidas as telas e funcionalidades. */
+.content {
+  padding: 26px 30px;
+  max-width: 1400px;
+  margin: auto;
+}
+
+/* Organização dos títulos das páginas. */
+.heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.heading h1 {
+  font-size: 25px;
+  margin: 4px 0 18px;
+}
+
+/* ==========================================
+   DASHBOARD
+   ========================================== */
+
+/* Organiza os indicadores do painel em colunas adaptáveis. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+/* Aparência dos cartões e painéis do sistema. */
+.card,
+.panel {
+  background: white;
+  border: 1px solid #e7e9ef;
+  border-radius: 13px;
+  padding: 21px;
+  box-shadow: 0 2px 7px #1e293b08;
+}
+
+/* Destaque dos valores exibidos nos indicadores. */
+.card strong {
+  display: block;
+  font-size: 29px;
+  margin-top: 12px;
+  color: #f97316;
+}
+
+/* ==========================================
+   PAINÉIS
+   ========================================== */
+
+/* Espaçamento e rolagem dos painéis. */
+.panel {
+  margin-bottom: 18px;
+  overflow: auto;
+}
+
+/* Títulos internos dos painéis. */
+.panel h2 {
+  font-size: 17px;
+  margin: 0 0 16px;
+}
+
+/* ==========================================
+   TABELAS
+   ========================================== */
+
+/* Estrutura das tabelas de registros. */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+/* Células e cabeçalhos das tabelas. */
+th,
+td {
+  padding: 13px 10px;
+  text-align: left;
+  border-bottom: 1px solid #edf0f4;
+}
+
+/* Diferencia visualmente os cabeçalhos. */
+th {
+  color: #687386;
+}
+
+/* Espaçamento entre botões nas tabelas. */
+td button {
+  margin: 2px;
+}
+
+/* ==========================================
+   STATUS E MENSAGENS
+   ========================================== */
+
+/* Etiquetas utilizadas para indicar status. */
+.pill {
+  border-radius: 99px;
+  background: #fff1e7;
+  color: #b45309;
+  padding: 5px 9px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Mensagem exibida quando não existem registros. */
+.empty {
+  padding: 28px;
+  text-align: center;
+  color: #7d8490;
+}
+
+/* ==========================================
+   FORMULÁRIOS EM COLUNAS
+   ========================================== */
+
+/* Distribui campos automaticamente conforme o espaço disponível. */
+.formgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 0 16px;
+}
+
+/* ==========================================
+   NOTIFICAÇÕES VISUAIS
+   ========================================== */
+
+/* Mensagem padrão de retorno de operações. */
+.notice {
+  padding: 12px;
+  border-radius: 9px;
+  margin: 10px 0;
+  background: #fef3c7;
+  color: #78350f;
+}
+
+/* Mensagem de erro. */
+.notice.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* Mensagem de sucesso. */
+.notice.ok {
+  background: #dcfce7;
+  color: #166534;
+}
+
+/* ==========================================
+   AÇÕES E UTILITÁRIOS
+   ========================================== */
+
+/* Organiza vários botões na mesma área. */
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Oculta elementos quando necessário. */
+.hidden {
+  display: none !important;
+}
+
+/* ==========================================
+   RESPONSIVIDADE DO SISTEMA
+   ========================================== */
+
+/* Adapta o menu e o conteúdo para telas menores. */
+@media (max-width: 760px) {
+  .layout {
+    display: block;
+  }
+
+  .sidebar {
+    width: 100%;
+    padding: 12px;
+    display: flex;
+    gap: 5px;
+    overflow: auto;
+    align-items: center;
+  }
+
+  .sidebar .logo {
+    padding: 5px 10px;
+    font-size: 18px;
+  }
+
+  .nav {
+    white-space: nowrap;
+    width: auto;
+    margin: 0;
+  }
+
+  .top,
+  .content {
+    padding: 16px;
+  }
+
+  .top {
+    flex-wrap: wrap;
+  }
+}
+
+/* ==========================================
+   AJUSTE DO LOGO NA BARRA LATERAL
+   ========================================== */
+
+/* Mantém o dimensionamento do menu lateral. */
+.sidebar {
+  box-sizing: border-box;
+}
+
+/* Impede que o nome LaunchControl seja cortado ou quebrado. */
 .sidebar .logo,
 .sidebar .brand,
 .sidebar .brand-name {
-    font-size: 18px !important;
-    letter-spacing: -0.6px !important;
-    white-space: nowrap;
+  font-size: 18px !important;
+  letter-spacing: -0.6px !important;
+  white-space: nowrap;
 }
-
 
 /* ==========================================
    LAUNCHCONTROL — PREMIUM DESIGN SYSTEM
    ========================================== */
 
+/* Variáveis utilizadas na identidade visual premium. */
 :root {
   --lc-orange: #ff791f;
   --lc-orange-hover: #ea6312;
@@ -27,8 +467,11 @@
   --lc-muted: #9da7b7;
 }
 
-/* LOGIN E CADASTRO */
+/* ==========================================
+   LOGIN E CADASTRO PREMIUM
+   ========================================== */
 
+/* Fundo escuro com iluminação alaranjada. */
 .login.lc-auth-page {
   min-height: 100vh;
   padding: 32px 16px;
@@ -45,22 +488,27 @@
     linear-gradient(145deg, #090c12, #171c26);
 }
 
+/* Cartão premium utilizado nas telas de autenticação. */
 .auth.lc-auth-card {
   width: min(100%, 460px);
   padding: 40px;
   background: rgba(23, 28, 37, 0.97);
-  border: 1px solid rgba(255,255,255,0.09);
+  border: 1px solid rgba(255, 255, 255, 0.09);
   border-radius: 24px;
   color: var(--lc-text);
-  box-shadow: 0 25px 80px rgba(0,0,0,0.45);
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.45);
 }
 
-/* IDENTIDADE VISUAL */
+/* ==========================================
+   IDENTIDADE VISUAL PREMIUM
+   ========================================== */
 
+/* Espaçamento da marca na autenticação. */
 .lc-brand {
   margin-bottom: 30px;
 }
 
+/* Nome LaunchControl com destaque alaranjado. */
 .lc-brand .logo {
   font-size: clamp(21px, 5vw, 28px);
   font-weight: 800;
@@ -69,10 +517,12 @@
   color: var(--lc-orange);
 }
 
+/* Segunda parte do nome em branco. */
 .lc-brand .logo span {
   color: #ffffff;
 }
 
+/* Texto auxiliar abaixo da marca. */
 .lc-brand-caption {
   display: block;
   margin-top: 7px;
@@ -82,6 +532,7 @@
   color: var(--lc-muted);
 }
 
+/* Pequeno título acima do cabeçalho. */
 .lc-eyebrow {
   color: var(--lc-orange);
   font-size: 11px;
@@ -89,10 +540,16 @@
   letter-spacing: 1.8px;
 }
 
+/* ==========================================
+   CABEÇALHO DA AUTENTICAÇÃO
+   ========================================== */
+
+/* Espaçamento entre o título e os formulários. */
 .lc-auth-heading {
   margin-bottom: 26px;
 }
 
+/* Título principal do login e cadastro. */
 .lc-auth-heading h1 {
   margin: 10px 0;
   color: #ffffff;
@@ -100,20 +557,25 @@
   letter-spacing: -0.8px;
 }
 
+/* Texto explicativo das telas de autenticação. */
 .lc-auth-heading p {
   color: var(--lc-muted);
   font-size: 14px;
   line-height: 1.6;
 }
 
-/* FORMULÁRIOS */
+/* ==========================================
+   FORMULÁRIOS PREMIUM
+   ========================================== */
 
+/* Distribui os campos verticalmente. */
 .lc-auth-form {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
+/* Rótulos dos campos do login e cadastro. */
 .lc-auth-form .field {
   display: flex;
   flex-direction: column;
@@ -124,6 +586,7 @@
   font-weight: 600;
 }
 
+/* Campos escuros da autenticação. */
 .lc-auth-form input,
 .lc-auth-form select {
   width: 100%;
@@ -137,28 +600,35 @@
   transition: border-color .2s, box-shadow .2s;
 }
 
+/* Destaque laranja ao selecionar um campo. */
 .lc-auth-form input:focus,
 .lc-auth-form select:focus {
   border-color: var(--lc-orange);
-  box-shadow: 0 0 0 3px rgba(255,121,31,.15);
+  box-shadow: 0 0 0 3px rgba(255, 121, 31, .15);
 }
 
+/* Cor dos exemplos exibidos nos campos. */
 .lc-auth-form input::placeholder {
   color: #7e8898;
 }
 
-/* VISIBILIDADE DA SENHA */
+/* ==========================================
+   VISIBILIDADE DA SENHA
+   ========================================== */
 
+/* Posiciona o botão de mostrar senha dentro do campo. */
 .lc-password-field {
   display: flex;
   position: relative;
   align-items: center;
 }
 
+/* Reserva espaço para o botão de visibilidade. */
 .lc-password-field input {
   padding-right: 82px;
 }
 
+/* Botão utilizado para mostrar ou ocultar a senha. */
 .lc-eye-button {
   position: absolute;
   right: 8px;
@@ -170,14 +640,18 @@
   font-weight: 700;
 }
 
-/* RECUPERAÇÃO DE SENHA */
+/* ==========================================
+   RECUPERAÇÃO DE SENHA
+   ========================================== */
 
+/* Alinha o botão de recuperação à direita. */
 .lc-forgot-row {
   display: flex;
   justify-content: flex-end;
   margin-top: -6px;
 }
 
+/* Links utilizados nas telas de autenticação. */
 .lc-auth-card .link {
   color: #ff9b5a;
   background: transparent;
@@ -186,13 +660,17 @@
   font-weight: 700;
 }
 
+/* Efeito visual ao passar o cursor sobre os links. */
 .lc-auth-card .link:hover {
   color: #ffc096;
   text-decoration: underline;
 }
 
-/* BOTÃO PRINCIPAL */
+/* ==========================================
+   BOTÃO PRINCIPAL PREMIUM
+   ========================================== */
 
+/* Botão de login, cadastro e recuperação de senha. */
 .lc-auth-card .lc-submit {
   width: 100%;
   min-height: 50px;
@@ -209,27 +687,33 @@
   transition: transform .2s, filter .2s;
 }
 
+/* Animação ao posicionar o cursor sobre o botão. */
 .lc-auth-card .lc-submit:hover {
   background: linear-gradient(110deg, #ffa052, #ff791f);
   transform: translateY(-2px);
 }
 
+/* Aparência do botão durante o processamento. */
 .lc-auth-card .lc-submit:disabled {
   opacity: .6;
   cursor: wait;
 }
 
-/* RODAPÉ */
+/* ==========================================
+   RODAPÉ DA AUTENTICAÇÃO
+   ========================================== */
 
+/* Área com links para alternar entre login e cadastro. */
 .lc-auth-footer {
   margin-top: 26px;
   padding-top: 20px;
-  border-top: 1px solid rgba(255,255,255,.09);
+  border-top: 1px solid rgba(255, 255, 255, .09);
   text-align: center;
   color: var(--lc-muted);
   font-size: 13px;
 }
 
+/* Texto localizado abaixo do cartão de autenticação. */
 .lc-auth-bottom {
   margin-top: 20px;
   color: #8d97a6;
@@ -237,8 +721,11 @@
   text-align: center;
 }
 
-/* RESPONSIVIDADE */
+/* ==========================================
+   RESPONSIVIDADE DO LOGIN PREMIUM
+   ========================================== */
 
+/* Ajusta o cartão e o logo em celulares pequenos. */
 @media (max-width: 480px) {
   .auth.lc-auth-card {
     padding: 26px 20px;
