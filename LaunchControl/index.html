@@ -1,1 +1,60 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LaunchControl | Gestão de Oficinas</title><link rel="stylesheet" href="/style.css"></head><body><div id="app"></div><script src="/app.js" defer></script></body></html>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <!--
+        Projeto: LaunchControl
+        Desenvolvedor: Gabriel Teodoro
+
+        Optei por manter o HTML organizado e separado
+        dos arquivos CSS e JavaScript para facilitar
+        a manutenção e a evolução do sistema.
+    -->
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--
+        Adicionei uma descrição do sistema para
+        identificar melhor sua finalidade e fornecer
+        informações sobre a aplicação.
+    -->
+    <meta
+        name="description"
+        content="LaunchControl - Sistema de gestão para oficinas automotivas."
+    >
+
+    <title>LaunchControl | Gestão de Oficinas Automotivas</title>
+
+    <!--
+        Mantive os estilos em um arquivo separado
+        porque isso facilita a padronização visual
+        e evita misturar apresentação com estrutura.
+    -->
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+    <!--
+        Decidi utilizar um elemento principal com id="app"
+        porque o JavaScript é responsável por renderizar
+        dinamicamente as telas do sistema.
+
+        Essa organização permite reutilizar componentes
+        e atualizar o conteúdo sem criar um HTML
+        diferente para cada funcionalidade.
+    -->
+    <div id="app"></div>
+
+    <!--
+        Utilizei o atributo defer para carregar o script
+        sem bloquear a leitura inicial do HTML.
+
+        O arquivo app.js concentra a lógica de interface,
+        enquanto o backend Java gerencia as regras
+        de negócio e a comunicação com o banco de dados.
+    -->
+    <script src="/app.js" defer></script>
+</body>
+</html>
+le><link rel="stylesheet" href="/style.css"></head><body><div id="app"></div><script src="/app.js" defer></script></body></html>
