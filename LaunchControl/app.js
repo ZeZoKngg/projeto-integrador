@@ -1,6 +1,22 @@
+/**
+ * A estrutura do frontend foi organizada em JavaScript
+ * para permitir que diferentes telas sejam carregadas
+ * dinamicamente, sem a necessidade de criar um arquivo
+ * HTML separado para cada funcionalidade.
+ *
+ * A comunicação com o backend Java é realizada
+ * através de requisições HTTP para a API REST.
+ */
 
 "use strict";
 
+/**
+ * CONFIGURAÇÃO DA API
+ *
+ * Centralizei a definição do endereço do backend
+ * para facilitar a execução do projeto em diferentes
+ * ambientes e evitar repetir a URL em cada requisição.
+ */
 const API_ORIGIN =
   location.port === "8080" ||
   location.protocol === "file:" ||
@@ -9,13 +25,39 @@ const API_ORIGIN =
     ? "http://localhost:8080"
     : "";
 
+/**
+ * Elemento principal da aplicação.
+ *
+ * O JavaScript utiliza o elemento com id="app"
+ * para apresentar dinamicamente as telas.
+ */
 const app = document.querySelector("#app");
 
+/**
+ * CONTROLE DO ESTADO DA APLICAÇÃO
+ *
+ * Essas variáveis armazenam temporariamente
+ * as informações necessárias para a navegação.
+ *
+ * auth: credenciais de autenticação.
+ * me: dados do usuário autenticado.
+ * tab: tela selecionada.
+ * msg: mensagens de retorno.
+ */
 let auth = null;
 let me = null;
 let tab = "dashboard";
 let msg = "";
 
+/**
+ * ARMAZENAMENTO DOS DADOS DA INTERFACE
+ *
+ * Organizei os dados por categoria para facilitar
+ * a atualização das informações recebidas do backend.
+ *
+ * Os registros permanentes ficam no banco de dados,
+ * não neste objeto JavaScript.
+ */
 let data = {
   solicitacoes: [],
   veiculos: [],
@@ -26,6 +68,15 @@ let data = {
   cobrancas: []
 };
 
+/**
+ * PROTEÇÃO DE CONTEÚDO HTML
+ *
+ * Utilizo esta função para converter caracteres
+ * especiais antes de inserir textos na interface.
+ *
+ * Isso reduz o risco de execução de HTML ou scripts
+ * indesejados quando informações são apresentadas.
+ */
 const esc = value =>
   String(value ?? "").replace(/[&<>"']/g, char => ({
     "&": "&amp;",
@@ -35,12 +86,24 @@ const esc = value =>
     "'": "&#39;"
   }[char]));
 
+/**
+ * FORMATAÇÃO MONETÁRIA
+ *
+ * Centralizei a formatação dos valores para manter
+ * o padrão brasileiro em toda a aplicação.
+ */
 const money = value =>
   Number(value || 0).toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL"
   });
 
+/**
+ * STATUS DOS ATENDIMENTOS
+ *
+ * Os valores utilizados pelo backend são convertidos
+ * em textos mais claros para os usuários.
+ */
 const statuses = {
   AGUARDANDO: "Aguardando",
   EM_ANALISE: "Em análise",
@@ -55,6 +118,22 @@ const statuses = {
    COMUNICAÇÃO COM O BACKEND
    ========================================== */
 
+/**
+ * FUNÇÃO CENTRAL DE REQUISIÇÕES
+ *
+ * Centralizar as requisições evita duplicação
+ * de código e facilita a manutenção da API.
+ *
+ * A função recebe:
+ * path: caminho do endpoint.
+ * method: método HTTP.
+ * body: dados enviados ao servidor.
+ *
+ * A autenticação Basic é enviada quando existe
+ * uma sessão ativa.
+ *
+ * Em produção, é necessário utilizar HTTPS.
+ */
 async function api(path, method = "GET", body) {
   const response = await fetch(API_ORIGIN + "/api" + path, {
     method,
@@ -86,6 +165,14 @@ async function api(path, method = "GET", body) {
   return text ? JSON.parse(text) : null;
 }
 
+/**
+ * MENSAGENS DE RETORNO
+ *
+ * Esta função padroniza os avisos exibidos após
+ * operações realizadas pelo usuário.
+ *
+ * A função esc() protege o conteúdo apresentado.
+ */
 function flash(text, error = false) {
   msg = `
     <div class="notice ${error ? "error" : "ok"}">
@@ -95,9 +182,21 @@ function flash(text, error = false) {
 }
 
 /* ==========================================
-   LOGIN E CADASTRO PREMIUM
+   LOGIN E CADASTRO
    ========================================== */
 
+/**
+ * TELA DE AUTENTICAÇÃO
+ *
+ * Utilizei uma única função para apresentar
+ * tanto o login quanto o cadastro.
+ *
+ * Essa escolha reduz a repetição de componentes
+ * e mantém o mesmo padrão visual nas duas telas.
+ *
+ * register = false: login.
+ * register = true: cadastro.
+ */
 function loginScreen(register = false) {
   const heading = register
     ? "Crie sua conta"
@@ -266,12 +365,20 @@ function loginScreen(register = false) {
     </main>
   `;
 
+  /**
+   * Alterna entre login e cadastro sem recarregar
+   * a página inteira.
+   */
   document.querySelector("#toggle").onclick =
     () => loginScreen(!register);
 
   const password = document.querySelector("#auth-password");
   const showPassword = document.querySelector("#show-password");
 
+  /**
+   * Permite visualizar ou ocultar a senha digitada,
+   * melhorando a experiência do usuário.
+   */
   showPassword.onclick = () => {
     const visible = password.type === "password";
 
@@ -286,12 +393,26 @@ function loginScreen(register = false) {
     );
   };
 
+  /**
+   * Abre a recuperação de senha quando o botão
+   * estiver disponível na tela de login.
+   */
   const forgot = document.querySelector("#esqueciSenha");
 
   if (forgot) {
     forgot.onclick = recoveryScreen;
   }
 
+  /**
+   * PROCESSAMENTO DO FORMULÁRIO
+   *
+   * No cadastro, os dados são enviados ao backend.
+   * No login, as credenciais são utilizadas para
+   * consultar o usuário autenticado.
+   *
+   * O botão é desabilitado durante o processamento
+   * para evitar envios repetidos.
+   */
   document.querySelector("#authform").onsubmit = async event => {
     event.preventDefault();
 
@@ -345,10 +466,25 @@ function loginScreen(register = false) {
   };
 }
 
+
 /* ==========================================
    RECUPERAÇÃO DE SENHA
    ========================================== */
 
+/**
+ * TELA DE RECUPERAÇÃO DE SENHA
+ *
+ * Mantive a recuperação de senha em uma função
+ * separada para facilitar a manutenção e evitar
+ * misturar essa funcionalidade com o login.
+ *
+ * O usuário informa seu e-mail e o frontend
+ * encaminha a solicitação para o backend Java.
+ *
+ * A validação do e-mail, a geração do link e
+ * o envio das instruções são responsabilidades
+ * do backend.
+ */
 function recoveryScreen() {
   app.innerHTML = `
     <main class="login lc-auth-page">
@@ -417,9 +553,24 @@ function recoveryScreen() {
     </main>
   `;
 
+  /**
+   * Permite retornar ao login sem atualizar
+   * toda a página.
+   */
   document.querySelector("#back-login").onclick =
     () => loginScreen(false);
 
+  /**
+   * ENVIO DA SOLICITAÇÃO
+   *
+   * Evito o comportamento padrão do formulário
+   * para enviar os dados por meio da API.
+   *
+   * A mensagem de sucesso não confirma se
+   * determinado e-mail existe no sistema.
+   * Essa abordagem ajuda a reduzir a exposição
+   * de informações sobre contas cadastradas.
+   */
   document.querySelector("#recovery-form").onsubmit =
     async event => {
       event.preventDefault();
@@ -459,6 +610,10 @@ function recoveryScreen() {
           </div>
         `;
       } finally {
+        /**
+         * Libero novamente o botão após a resposta,
+         * independentemente de sucesso ou erro.
+         */
         button.disabled = false;
       }
     };
@@ -468,30 +623,72 @@ function recoveryScreen() {
    CARREGAMENTO DOS DADOS
    ========================================== */
 
+/**
+ * ATUALIZAÇÃO DOS DADOS DO SISTEMA
+ *
+ * Centralizei as consultas nesta função para
+ * manter as informações atualizadas após
+ * o login e as operações de cadastro,
+ * edição ou exclusão.
+ *
+ * Cada perfil recebe apenas as consultas
+ * necessárias para suas funcionalidades.
+ *
+ * IMPORTANTE:
+ * O controle visual de perfis não substitui
+ * a autorização no backend. O servidor deve
+ * validar o acesso a cada endpoint.
+ */
 async function refresh() {
+  /**
+   * As solicitações e notificações são
+   * carregadas conforme o usuário autenticado.
+   */
   data.solicitacoes = await api("/solicitacoes");
   data.notificacoes = await api("/notificacoes");
 
+  /**
+   * Somente o perfil CLIENTE precisa carregar
+   * seus veículos nesta parte da aplicação.
+   */
   data.veiculos =
     me.perfil === "CLIENTE"
       ? await api("/veiculos")
       : [];
 
+  /**
+   * O estoque de peças é consultado pelos
+   * perfis relacionados ao fornecimento
+   * e à gestão de serviços.
+   */
   data.pecas =
     ["FORNECEDOR", "OFICINA", "ADMINISTRADOR"].includes(me.perfil)
       ? await api("/pecas")
       : [];
 
+  /**
+   * A listagem administrativa de usuários
+   * é solicitada somente pelo administrador.
+   */
   data.usuarios =
     me.perfil === "ADMINISTRADOR"
       ? await api("/admin/usuarios")
       : [];
 
+  /**
+   * O cliente consulta as oficinas disponíveis
+   * para selecionar uma ao criar solicitações.
+   */
   data.oficinas =
     me.perfil === "CLIENTE"
       ? await api("/oficinas")
       : [];
 
+  /**
+   * As cobranças são carregadas para exibição
+   * das informações financeiras permitidas
+   * ao usuário autenticado.
+   */
   data.cobrancas = await api("/cobrancas");
 }
 
@@ -499,10 +696,34 @@ async function refresh() {
    NAVEGAÇÃO
    ========================================== */
 
+/**
+ * MENU DE NAVEGAÇÃO
+ *
+ * Organizei as opções do menu em uma lista
+ * de objetos para evitar criar manualmente
+ * cada botão em diferentes partes do sistema.
+ *
+ * Cada item possui:
+ * id: identificador interno da tela.
+ * label: nome exibido no menu.
+ * roles: perfis autorizados a visualizar a opção.
+ *
+ * Quando roles não é informado, a opção
+ * fica visível para todos os perfis autenticados.
+ *
+ * Essa filtragem melhora a experiência visual,
+ * mas a segurança dos dados depende do backend.
+ */
 function tabs() {
   return [
-    { id: "dashboard", label: "▦ Painel" },
-    { id: "solicitacoes", label: "▤ Solicitações" },
+    {
+      id: "dashboard",
+      label: "▦ Painel"
+    },
+    {
+      id: "solicitacoes",
+      label: "▤ Solicitações"
+    },
     {
       id: "veiculos",
       label: "▣ Veículos",
@@ -513,14 +734,23 @@ function tabs() {
       label: "◷ Minha garagem",
       roles: ["CLIENTE"]
     },
-    { id: "pesquisa", label: "⌕ Pesquisa de peças" },
+    {
+      id: "pesquisa",
+      label: "⌕ Pesquisa de peças"
+    },
     {
       id: "pecas",
       label: "⚙ Peças",
       roles: ["FORNECEDOR", "OFICINA", "ADMINISTRADOR"]
     },
-    { id: "cobrancas", label: "▤ Cobranças" },
-    { id: "notificacoes", label: "♧ Notificações" },
+    {
+      id: "cobrancas",
+      label: "▤ Cobranças"
+    },
+    {
+      id: "notificacoes",
+      label: "♧ Notificações"
+    },
     {
       id: "usuarios",
       label: "♙ Usuários",
@@ -535,6 +765,18 @@ function tabs() {
    LAYOUT PRINCIPAL
    ========================================== */
 
+/**
+ * RENDERIZAÇÃO DA INTERFACE
+ *
+ * Utilizo esta função para montar o layout
+ * principal depois que o usuário realiza login.
+ *
+ * O menu lateral, o cabeçalho e a área de
+ * conteúdo são gerados dinamicamente.
+ *
+ * Isso permite manter uma estrutura visual
+ * consistente durante a navegação.
+ */
 function render() {
   app.innerHTML = `
     <div class="layout">
@@ -544,14 +786,16 @@ function render() {
           LAUNCH<span>CONTROL</span>
         </div>
 
-        ${tabs().map(item => `
-          <button
-            class="nav ${tab === item.id ? "active" : ""}"
-            data-tab="${item.id}"
-          >
-            ${item.label}
-          </button>
-        `).join("")}
+        ${
+          tabs().map(item => `
+            <button
+              class="nav ${tab === item.id ? "active" : ""}"
+              data-tab="${item.id}"
+            >
+              ${item.label}
+            </button>
+          `).join("")
+        }
       </aside>
 
       <div class="main">
@@ -586,8 +830,21 @@ function render() {
     </div>
   `;
 
+  /**
+   * Limpo a mensagem temporária após sua
+   * inclusão na interface.
+   */
   msg = "";
 
+  /**
+   * NAVEGAÇÃO ENTRE AS TELAS
+   *
+   * Cada botão atualiza a variável tab
+   * e solicita uma nova renderização.
+   *
+   * Dessa forma, a navegação acontece
+   * sem recarregar a página inteira.
+   */
   document.querySelectorAll("[data-tab]").forEach(button => {
     button.onclick = () => {
       tab = button.dataset.tab;
@@ -595,12 +852,25 @@ function render() {
     };
   });
 
+  /**
+   * ENCERRAMENTO DA SESSÃO
+   *
+   * Ao sair, removo as credenciais mantidas
+   * em memória e os dados do usuário atual.
+   *
+   * Depois disso, a tela de login é exibida.
+   */
   document.querySelector("#logout").onclick = () => {
     auth = null;
     me = null;
     loginScreen();
   };
 
+  /**
+   * Depois de gerar os elementos HTML,
+   * conecto os eventos dos formulários
+   * e botões às suas funcionalidades.
+   */
   bind();
 }
 
@@ -608,6 +878,15 @@ function render() {
    COMPONENTES REUTILIZÁVEIS
    ========================================== */
 
+/**
+ * COMPONENTE DE INDICADOR
+ *
+ * Cria cartões utilizados para apresentar
+ * informações resumidas no dashboard.
+ *
+ * Reutilizar esta função evita repetir
+ * a mesma estrutura HTML.
+ */
 function card(label, value) {
   return `
     <div class="card">
@@ -617,6 +896,18 @@ function card(label, value) {
   `;
 }
 
+/**
+ * COMPONENTE DE TABELA
+ *
+ * Centraliza a construção de tabelas
+ * utilizadas em diferentes módulos.
+ *
+ * Também apresenta uma mensagem quando
+ * não existem registros disponíveis.
+ *
+ * A função esc() é utilizada para proteger
+ * os textos exibidos nas células.
+ */
 function table(headers, rows) {
   if (!rows.length) {
     return `
@@ -649,6 +940,16 @@ function table(headers, rows) {
   `;
 }
 
+/**
+ * COMPONENTE DE FORMULÁRIO
+ *
+ * Cria uma estrutura padronizada para
+ * formulários de diferentes funcionalidades.
+ *
+ * O atributo data-form identifica qual
+ * operação deverá ser executada quando
+ * o usuário enviar os dados.
+ */
 function form(id, fields, label) {
   return `
     <form data-form="${id}">
@@ -664,8 +965,33 @@ function form(id, fields, label) {
    AÇÕES DAS SOLICITAÇÕES
    ========================================== */
 
+/**
+ * AÇÕES DISPONÍVEIS POR PERFIL
+ *
+ * Organizei as ações conforme o perfil do usuário
+ * e a situação atual de cada solicitação.
+ *
+ * Essa separação permite que clientes e oficinas
+ * tenham opções diferentes durante o atendimento.
+ *
+ * A oficina pode elaborar orçamentos, iniciar
+ * serviços aprovados e registrar sua conclusão.
+ *
+ * O cliente pode aprovar ou recusar propostas
+ * e avaliar serviços finalizados.
+ *
+ * IMPORTANTE:
+ * As permissões também precisam ser verificadas
+ * pelo backend, pois ocultar botões no frontend
+ * não é suficiente para garantir a segurança.
+ */
 function actions(item) {
   if (me.perfil === "OFICINA") {
+    /**
+     * Enquanto a solicitação estiver em análise
+     * ou aguardando aprovação, a oficina poderá
+     * acessar a funcionalidade de orçamento.
+     */
     if (
       ["AGUARDANDO", "EM_ANALISE", "AGUARDANDO_APROVACAO"]
         .includes(item.status)
@@ -677,6 +1003,10 @@ function actions(item) {
       `;
     }
 
+    /**
+     * O serviço poderá ser iniciado quando
+     * o cliente aprovar o orçamento.
+     */
     if (item.status === "APROVADO") {
       return `
         <button
@@ -689,6 +1019,10 @@ function actions(item) {
       `;
     }
 
+    /**
+     * Após a execução, a oficina poderá
+     * finalizar o atendimento.
+     */
     if (item.status === "EM_EXECUCAO") {
       return `
         <button
@@ -702,6 +1036,13 @@ function actions(item) {
     }
   }
 
+  /**
+   * APROVAÇÃO DO CLIENTE
+   *
+   * O cliente recebe as opções de aprovar
+   * ou recusar uma proposta quando ela
+   * estiver aguardando sua decisão.
+   */
   if (
     me.perfil === "CLIENTE" &&
     item.status === "AGUARDANDO_APROVACAO"
@@ -727,6 +1068,13 @@ function actions(item) {
     `;
   }
 
+  /**
+   * AVALIAÇÃO DO ATENDIMENTO
+   *
+   * A avaliação é disponibilizada quando
+   * o serviço está concluído e ainda
+   * não recebeu uma avaliação.
+   */
   if (
     me.perfil === "CLIENTE" &&
     item.status === "CONCLUIDO" &&
@@ -742,7 +1090,22 @@ function actions(item) {
   return "—";
 }
 
+/**
+ * TABELA DE SOLICITAÇÕES
+ *
+ * Centralizei a apresentação das solicitações
+ * para reutilizá-la no painel, na listagem
+ * de atendimentos e no histórico dos veículos.
+ *
+ * Cada registro apresenta informações do cliente,
+ * veículo, serviço, status, orçamento e ações.
+ */
 function requests(items) {
+  /**
+   * Quando não existem solicitações,
+   * apresento uma mensagem informativa
+   * em vez de uma tabela vazia.
+   */
   if (!items.length) {
     return `
       <div class="empty">
@@ -820,11 +1183,37 @@ function requests(items) {
    CONTEÚDO DOS MÓDULOS
    ========================================== */
 
+/**
+ * GERENCIAMENTO DAS TELAS
+ *
+ * Utilizo a variável tab para identificar
+ * qual módulo deve ser apresentado.
+ *
+ * O switch permite organizar as funcionalidades
+ * em uma estrutura centralizada.
+ *
+ * Cada case retorna o HTML correspondente
+ * à tela selecionada pelo usuário.
+ */
 function content() {
   const solicitacoes = data.solicitacoes;
 
   switch (tab) {
 
+    /* ======================================
+       DASHBOARD
+       ====================================== */
+
+    /**
+     * PAINEL PRINCIPAL
+     *
+     * O dashboard apresenta indicadores
+     * que ajudam o usuário a acompanhar
+     * o andamento dos atendimentos.
+     *
+     * Os valores são calculados a partir
+     * dos dados recebidos do backend.
+     */
     case "dashboard":
       return `
         <div class="grid">
@@ -851,32 +1240,53 @@ function content() {
             ).length
           )}
 
-          ${card(
-            "Faturamento pago",
-            money(
-              data.cobrancas
-                .filter(item => item.status === "PAGO")
-                .reduce(
-                  (total, item) =>
-                    total + Number(item.valor),
-                  0
-                )
+          ${
+            /**
+             * FATURAMENTO
+             *
+             * Somo somente as cobranças que possuem
+             * status PAGO para apresentar o valor
+             * registrado como recebido.
+             */
+            card(
+              "Faturamento pago",
+              money(
+                data.cobrancas
+                  .filter(item => item.status === "PAGO")
+                  .reduce(
+                    (total, item) =>
+                      total + Number(item.valor),
+                    0
+                  )
+              )
             )
-          )}
+          }
 
-          ${card(
-            "Conversão",
-            solicitacoes.filter(item => item.orcamento).length
-              ? Math.round(
-                  100 *
-                  solicitacoes.filter(item =>
-                    ["APROVADO", "EM_EXECUCAO", "CONCLUIDO"]
-                      .includes(item.status)
-                  ).length /
-                  solicitacoes.filter(item => item.orcamento).length
-                ) + "%"
-              : "0%"
-          )}
+          ${
+            /**
+             * INDICADOR DE CONVERSÃO
+             *
+             * Relaciona os atendimentos aprovados
+             * ou em andamento à quantidade de
+             * solicitações com orçamento.
+             *
+             * Quando não existem orçamentos,
+             * o indicador apresenta 0%.
+             */
+            card(
+              "Conversão",
+              solicitacoes.filter(item => item.orcamento).length
+                ? Math.round(
+                    100 *
+                    solicitacoes.filter(item =>
+                      ["APROVADO", "EM_EXECUCAO", "CONCLUIDO"]
+                        .includes(item.status)
+                    ).length /
+                    solicitacoes.filter(item => item.orcamento).length
+                  ) + "%"
+                : "0%"
+            )
+          }
         </div>
 
         <div class="panel">
@@ -885,6 +1295,20 @@ function content() {
         </div>
       `;
 
+    /* ======================================
+       SOLICITAÇÕES
+       ====================================== */
+
+    /**
+     * GERENCIAMENTO DE SOLICITAÇÕES
+     *
+     * O cliente pode selecionar uma oficina,
+     * escolher um veículo e descrever o
+     * problema ou serviço desejado.
+     *
+     * Os demais perfis visualizam as
+     * solicitações disponibilizadas pelo backend.
+     */
     case "solicitacoes":
       return `
         ${
@@ -958,6 +1382,19 @@ function content() {
         </div>
       `;
 
+    /* ======================================
+       VEÍCULOS
+       ====================================== */
+
+    /**
+     * CADASTRO E GERENCIAMENTO DE VEÍCULOS
+     *
+     * O cliente pode cadastrar seus veículos
+     * e consultar os registros existentes.
+     *
+     * Os dados são utilizados posteriormente
+     * na abertura de solicitações de serviço.
+     */
     case "veiculos":
       return `
         <div class="panel">
@@ -1060,6 +1497,20 @@ function content() {
         </div>
       `;
 
+    /* ======================================
+       MINHA GARAGEM
+       ====================================== */
+
+    /**
+     * HISTÓRICO DOS VEÍCULOS
+     *
+     * Organizei esta tela para que o cliente
+     * acompanhe os serviços relacionados
+     * a cada veículo cadastrado.
+     *
+     * As solicitações são filtradas pelo ID
+     * do veículo e ordenadas por data.
+     */
     case "garagem":
       return `
         <div class="panel">
@@ -1099,6 +1550,22 @@ function content() {
         </div>
       `;
 
+    /* ======================================
+       PESQUISA DE PEÇAS
+       ====================================== */
+
+    /**
+     * PESQUISA EXTERNA DE PEÇAS
+     *
+     * Esta funcionalidade permite pesquisar
+     * peças automotivas considerando o veículo.
+     *
+     * A pesquisa utiliza links externos para
+     * Mercado Livre e OLX.
+     *
+     * Os resultados e preços são consultados
+     * diretamente nessas plataformas.
+     */
     case "pesquisa":
       return `
         <div class="panel">
@@ -1155,6 +1622,20 @@ function content() {
         </div>
       `;
 
+    /* ======================================
+       ESTOQUE DE PEÇAS
+       ====================================== */
+
+    /**
+     * CONTROLE DE PEÇAS
+     *
+     * O fornecedor pode cadastrar peças
+     * informando código, nome, preço
+     * e quantidade disponível.
+     *
+     * A listagem apresenta os registros
+     * recebidos do backend.
+     */
     case "pecas":
       return `
         ${
@@ -1222,6 +1703,22 @@ function content() {
         </div>
       `;
 
+    /* ======================================
+       COBRANÇAS
+       ====================================== */
+
+    /**
+     * CONTROLE DE COBRANÇAS
+     *
+     * A tela apresenta informações financeiras
+     * relacionadas aos atendimentos.
+     *
+     * Quando uma cobrança está pendente,
+     * a oficina pode registrar o pagamento.
+     *
+     * O backend deve validar a autorização
+     * e a mudança de status da cobrança.
+     */
     case "cobrancas":
       return `
         <div class="panel">
@@ -1278,6 +1775,19 @@ function content() {
         </div>
       `;
 
+    /* ======================================
+       NOTIFICAÇÕES
+       ====================================== */
+
+    /**
+     * CENTRAL DE NOTIFICAÇÕES
+     *
+     * Esta tela permite acompanhar avisos
+     * relacionados às atividades do sistema.
+     *
+     * As notificações não lidas são identificadas
+     * visualmente e podem ser marcadas como lidas.
+     */
     case "notificacoes":
       return `
         <div class="panel">
@@ -1318,6 +1828,19 @@ function content() {
         </div>
       `;
 
+    /* ======================================
+       ADMINISTRAÇÃO DE USUÁRIOS
+       ====================================== */
+
+    /**
+     * CONSULTA ADMINISTRATIVA
+     *
+     * O administrador pode visualizar
+     * os usuários cadastrados no sistema.
+     *
+     * A tabela apresenta informações básicas
+     * como nome, e-mail e perfil.
+     */
     case "usuarios":
       return `
         <div class="panel">
@@ -1336,6 +1859,10 @@ function content() {
       `;
   }
 
+  /**
+   * Caso nenhuma opção corresponda à tela
+   * selecionada, retorna conteúdo vazio.
+   */
   return "";
 }
 
@@ -1343,13 +1870,45 @@ function content() {
    EXECUÇÃO DE OPERAÇÕES
    ========================================== */
 
+/**
+ * EXECUÇÃO CENTRALIZADA DE OPERAÇÕES
+ *
+ * Centralizei nesta função as operações
+ * realizadas pelo frontend no backend Java.
+ *
+ * Essa organização evita repetir o mesmo
+ * tratamento de erros e atualização de dados
+ * em diferentes funcionalidades do sistema.
+ *
+ * Parâmetros:
+ * path: endereço do endpoint da API.
+ * method: método HTTP utilizado.
+ * body: informações enviadas ao servidor.
+ * success: mensagem exibida após a operação.
+ *
+ * Após uma operação bem-sucedida, os dados
+ * são consultados novamente para atualizar
+ * as informações apresentadas ao usuário.
+ */
 async function execute(path, method, body, success) {
   try {
     await api(path, method, body);
+
+    // Atualiza os dados após a operação.
     await refresh();
+
+    // Prepara a mensagem de sucesso.
     flash(success);
+
+    // Atualiza a interface.
     render();
+
   } catch (error) {
+    /**
+     * Caso ocorra um erro, apresento uma
+     * mensagem ao usuário sem interromper
+     * completamente a aplicação.
+     */
     flash(error.message, true);
     render();
   }
@@ -1359,7 +1918,39 @@ async function execute(path, method, body, success) {
    EVENTOS E FORMULÁRIOS
    ========================================== */
 
+/**
+ * CONFIGURAÇÃO DOS EVENTOS DA INTERFACE
+ *
+ * Como as telas são geradas dinamicamente,
+ * os eventos precisam ser associados aos
+ * elementos após sua criação no HTML.
+ *
+ * A função bind() concentra essa responsabilidade,
+ * facilitando a localização e manutenção das
+ * interações realizadas pelos usuários.
+ */
 function bind() {
+
+  /* ======================================
+     PESQUISA EXTERNA DE PEÇAS
+     ====================================== */
+
+  /**
+   * PESQUISA DE PEÇAS AUTOMOTIVAS
+   *
+   * Permite pesquisar peças considerando
+   * o modelo e o ano do veículo.
+   *
+   * O cliente pode selecionar um veículo
+   * cadastrado, enquanto outros perfis
+   * podem informar os dados manualmente.
+   *
+   * A consulta é realizada por meio de links
+   * externos para Mercado Livre e OLX.
+   *
+   * Essa funcionalidade não consulta diretamente
+   * o estoque dessas plataformas por uma API.
+   */
   const searchForm = document.querySelector("#parts-search");
 
   if (searchForm) {
@@ -1368,12 +1959,20 @@ function bind() {
 
       const carElement = document.querySelector("#search-car");
 
+      /**
+       * Localiza o veículo selecionado
+       * entre os registros carregados.
+       */
       const vehicle = carElement
         ? data.veiculos.find(item =>
             String(item.id) === carElement.value
           )
         : null;
 
+      /**
+       * Utiliza o veículo cadastrado ou
+       * o texto informado manualmente.
+       */
       const car = vehicle
         ? `${vehicle.modelo} ${vehicle.ano}`
         : document.querySelector("#search-car-free")
@@ -1384,6 +1983,10 @@ function bind() {
 
       if (!car || !part) return;
 
+      /**
+       * Codifica os termos para que possam
+       * ser utilizados em endereços de pesquisa.
+       */
       const query = encodeURIComponent(
         `${part} ${car}`.trim()
       );
@@ -1394,6 +1997,12 @@ function bind() {
       const olx =
         "https://www.olx.com.br/brasil?q=" + query;
 
+      /**
+       * Apresenta os links de pesquisa.
+       *
+       * As páginas são abertas em outra aba,
+       * preservando a navegação no LaunchControl.
+       */
       document.querySelector("#parts-results").innerHTML = `
         <div class="panel">
           <h3>
@@ -1429,6 +2038,23 @@ function bind() {
     };
   }
 
+  /* ======================================
+     CADASTROS DO SISTEMA
+     ====================================== */
+
+  /**
+   * PROCESSAMENTO DOS FORMULÁRIOS
+   *
+   * Utilizo o atributo data-form para identificar
+   * qual operação deve ser realizada.
+   *
+   * O FormData permite obter os valores dos
+   * campos sem precisar consultar cada input
+   * individualmente.
+   *
+   * Os dados são enviados ao backend, responsável
+   * por validá-los e persistir os registros.
+   */
   document.querySelectorAll("[data-form]").forEach(formElement => {
     formElement.onsubmit = event => {
       event.preventDefault();
@@ -1439,6 +2065,12 @@ function bind() {
 
       const kind = formElement.dataset.form;
 
+      /**
+       * CADASTRO DE VEÍCULO
+       *
+       * Converto ano e quilometragem para números
+       * antes de enviar os dados ao backend.
+       */
       if (kind === "veiculo") {
         return execute(
           "/veiculos",
@@ -1452,6 +2084,15 @@ function bind() {
         );
       }
 
+      /**
+       * ABERTURA DE SOLICITAÇÃO
+       *
+       * O cliente informa o serviço desejado,
+       * seleciona um veículo e escolhe a oficina.
+       *
+       * Os identificadores são convertidos
+       * para números antes do envio.
+       */
       if (kind === "solicitacao") {
         return execute(
           "/solicitacoes",
@@ -1465,6 +2106,12 @@ function bind() {
         );
       }
 
+      /**
+       * CADASTRO DE PEÇAS
+       *
+       * Permite ao fornecedor registrar peças
+       * com informações de preço e quantidade.
+       */
       if (kind === "peca") {
         return execute(
           "/pecas",
@@ -1480,6 +2127,16 @@ function bind() {
     };
   });
 
+  /* ======================================
+     NOTIFICAÇÕES
+     ====================================== */
+
+  /**
+   * MARCAR NOTIFICAÇÃO COMO LIDA
+   *
+   * O identificador da notificação é utilizado
+   * para atualizar seu estado no backend.
+   */
   document.querySelectorAll("[data-read]").forEach(button => {
     button.onclick = () => execute(
       "/notificacoes/" + button.dataset.read + "/lida",
@@ -1489,6 +2146,20 @@ function bind() {
     );
   });
 
+  /* ======================================
+     APROVAÇÃO DE ORÇAMENTOS
+     ====================================== */
+
+  /**
+   * DECISÃO DO CLIENTE
+   *
+   * O cliente pode aprovar ou recusar
+   * o orçamento apresentado pela oficina.
+   *
+   * O valor enviado é booleano:
+   * true: orçamento aprovado.
+   * false: orçamento recusado.
+   */
   document.querySelectorAll("[data-decision]").forEach(button => {
     button.onclick = () => execute(
       "/solicitacoes/" + button.dataset.decision + "/decisao",
@@ -1500,6 +2171,20 @@ function bind() {
     );
   });
 
+  /* ======================================
+     ATUALIZAÇÃO DE STATUS
+     ====================================== */
+
+  /**
+   * ALTERAÇÃO DA SITUAÇÃO DO SERVIÇO
+   *
+   * A oficina pode iniciar um atendimento
+   * aprovado ou concluir um serviço em execução.
+   *
+   * Para concluir, é solicitado um laudo técnico,
+   * permitindo registrar informações sobre
+   * o serviço realizado.
+   */
   document.querySelectorAll("[data-status]").forEach(button => {
     button.onclick = () => {
       let laudo = "";
@@ -1509,6 +2194,10 @@ function bind() {
           "Informe o laudo técnico de conclusão:"
         ) || "";
 
+        /**
+         * Não permite prosseguir com a conclusão
+         * quando o laudo está vazio.
+         */
         if (!laudo.trim()) return;
       }
 
@@ -1524,18 +2213,55 @@ function bind() {
     };
   });
 
+  /* ======================================
+     ABERTURA DAS FUNCIONALIDADES
+     ====================================== */
+
+  /**
+   * ORÇAMENTOS
+   *
+   * Associa o botão de orçamento à função
+   * responsável por apresentar seu formulário.
+   */
   document.querySelectorAll("[data-quote]").forEach(button => {
     button.onclick = () => quote(button.dataset.quote);
   });
 
+  /**
+   * AVALIAÇÕES
+   *
+   * Abre o formulário de avaliação
+   * do atendimento selecionado.
+   */
   document.querySelectorAll("[data-review]").forEach(button => {
     button.onclick = () => review(button.dataset.review);
   });
 
+  /**
+   * DETALHES DO ATENDIMENTO
+   *
+   * Apresenta informações completas
+   * sobre a solicitação selecionada.
+   */
   document.querySelectorAll("[data-detail]").forEach(button => {
     button.onclick = () => detail(button.dataset.detail);
   });
 
+  /* ======================================
+     EDIÇÃO DE VEÍCULOS
+     ====================================== */
+
+  /**
+   * ATUALIZAÇÃO DE VEÍCULOS
+   *
+   * Permite alterar informações de um veículo
+   * previamente cadastrado.
+   *
+   * Os dados atuais são utilizados como valores
+   * iniciais nos campos de edição.
+   *
+   * A operação utiliza o método HTTP PUT.
+   */
   document.querySelectorAll("[data-editvehicle]").forEach(button => {
     button.onclick = () => {
       const vehicle = data.veiculos.find(
@@ -1570,6 +2296,21 @@ function bind() {
     };
   });
 
+  /* ======================================
+     EXCLUSÃO DE VEÍCULOS
+     ====================================== */
+
+  /**
+   * EXCLUSÃO DE VEÍCULOS
+   *
+   * Solicito uma confirmação antes de excluir
+   * um veículo para reduzir o risco de
+   * remoções acidentais.
+   *
+   * A exclusão definitiva depende das regras
+   * implementadas no backend e das relações
+   * existentes no banco de dados.
+   */
   document.querySelectorAll("[data-delvehicle]").forEach(button => {
     button.onclick = () => {
       if (confirm("Excluir veículo sem histórico?")) {
@@ -1583,6 +2324,19 @@ function bind() {
     };
   });
 
+  /* ======================================
+     CONTROLE DE PAGAMENTOS
+     ====================================== */
+
+  /**
+   * REGISTRO DE PAGAMENTO
+   *
+   * Antes de marcar uma cobrança como paga,
+   * apresento uma confirmação ao usuário.
+   *
+   * O backend recebe o novo status e deve
+   * verificar se a alteração é permitida.
+   */
   document.querySelectorAll("[data-pay]").forEach(button => {
     button.onclick = () => {
       if (confirm("Confirmar recebimento do pagamento?")) {
@@ -1601,6 +2355,21 @@ function bind() {
    ORÇAMENTO
    ========================================== */
 
+/**
+ * FORMULÁRIO DE ORÇAMENTO
+ *
+ * Esta funcionalidade permite que a oficina
+ * elabore uma proposta para uma solicitação.
+ *
+ * O orçamento possui valores separados para
+ * peças, mão de obra, descontos e adicionais.
+ *
+ * Também é possível informar o prazo estimado
+ * e observações relacionadas ao serviço.
+ *
+ * A separação desses campos facilita a
+ * apresentação dos custos ao cliente.
+ */
 function quote(id) {
   document.querySelector(".content").innerHTML = `
     <div class="heading">
@@ -1686,8 +2455,22 @@ function quote(id) {
     </div>
   `;
 
+  /**
+   * Retorna ao painel anterior sem precisar
+   * recarregar a aplicação.
+   */
   document.querySelector("#back").onclick = render;
 
+  /**
+   * ENVIO DO ORÇAMENTO
+   *
+   * Os valores do formulário são obtidos
+   * por meio de FormData.
+   *
+   * Como os campos HTML são recebidos como
+   * texto, realizo a conversão dos valores
+   * numéricos antes de enviar ao backend.
+   */
   document.querySelector('[data-form="orcamento"]').onsubmit =
     event => {
       event.preventDefault();
@@ -1706,6 +2489,14 @@ function quote(id) {
         values[key] = Number(values[key]);
       }
 
+      /**
+       * Envia o orçamento para a solicitação
+       * correspondente.
+       *
+       * O backend é responsável por validar
+       * os valores, calcular o total e registrar
+       * a proposta no banco de dados.
+       */
       execute(
         "/solicitacoes/" + id + "/orcamento",
         "POST",
@@ -1719,26 +2510,95 @@ function quote(id) {
    DETALHES DO ATENDIMENTO
    ========================================== */
 
+/**
+ * CONSULTA COMPLETA DO ATENDIMENTO
+ *
+ * Esta função reúne as informações relacionadas
+ * a uma solicitação de serviço automotivo.
+ *
+ * Mantive os detalhes do atendimento em uma
+ * função específica para organizar a consulta
+ * e a apresentação das informações.
+ *
+ * São consultados:
+ * - Dados gerais da solicitação.
+ * - Histórico de orçamentos.
+ * - Mensagens entre cliente e oficina.
+ * - Arquivos anexados ao atendimento.
+ * - Diário de manutenção.
+ *
+ * As informações são obtidas do backend Java,
+ * responsável por consultar os registros
+ * persistidos no banco de dados.
+ */
 async function detail(id) {
   try {
+    /**
+     * CONSULTA DOS DADOS PRINCIPAIS
+     *
+     * O identificador da solicitação permite
+     * recuperar os dados do atendimento.
+     */
     const item = await api("/solicitacoes/" + id);
 
+    /**
+     * HISTÓRICO DE ORÇAMENTOS
+     *
+     * Mantive uma consulta específica para
+     * apresentar as propostas registradas
+     * durante o atendimento.
+     *
+     * Isso permite acompanhar alterações
+     * realizadas nos valores dos serviços.
+     */
     const historico = await api(
       "/solicitacoes/" + id + "/historico-orcamento"
     );
 
+    /**
+     * CONVERSA DO ATENDIMENTO
+     *
+     * Recupera as mensagens trocadas entre
+     * os participantes da solicitação.
+     */
     const mensagens = await api(
       "/solicitacoes/" + id + "/mensagens"
     );
 
+    /**
+     * ANEXOS DO ATENDIMENTO
+     *
+     * Consulta os registros de arquivos
+     * relacionados ao diagnóstico ou serviço.
+     */
     const anexos = await api(
       "/solicitacoes/" + id + "/anexos"
     );
 
+    /**
+     * DIÁRIO DE MANUTENÇÃO
+     *
+     * Recupera as observações registradas
+     * durante a execução dos serviços.
+     */
     const diario = await api(
       "/solicitacoes/" + id + "/diario"
     );
 
+    /* ======================================
+       APRESENTAÇÃO DOS DETALHES
+       ====================================== */
+
+    /**
+     * RENDERIZAÇÃO DOS DADOS
+     *
+     * As informações consultadas são
+     * apresentadas na área principal.
+     *
+     * Utilizo esc() nos textos recebidos
+     * do backend para reduzir riscos
+     * associados à inserção de HTML.
+     */
     document.querySelector(".content").innerHTML = `
       <h1>Solicitação #${esc(item.id)}</h1>
 
@@ -1767,6 +2627,16 @@ async function detail(id) {
         </p>
 
         ${
+          /**
+           * APRESENTAÇÃO DO ORÇAMENTO
+           *
+           * Os valores são exibidos somente
+           * quando existe uma proposta
+           * associada à solicitação.
+           *
+           * A função money() mantém o padrão
+           * monetário brasileiro.
+           */
           item.orcamento
             ? `
               <h2>Proposta</h2>
@@ -1805,6 +2675,12 @@ async function detail(id) {
         <h2>Histórico de propostas</h2>
 
         ${
+          /**
+           * HISTÓRICO DAS PROPOSTAS
+           *
+           * Cada registro apresenta a data,
+           * o valor e a descrição da alteração.
+           */
           historico.length
             ? historico.map(entry => `
                 <p>
@@ -1831,6 +2707,10 @@ async function detail(id) {
           </p>
 
           ${
+            /**
+             * O laudo final é apresentado
+             * quando já foi registrado.
+             */
             item.laudo
               ? `
                 <p>
@@ -1842,6 +2722,10 @@ async function detail(id) {
           }
         </div>
 
+        /* ======================================
+           DIÁRIO DE MANUTENÇÃO
+           ====================================== */
+
         <h2>Diário de manutenção</h2>
 
         <p class="muted">
@@ -1849,6 +2733,12 @@ async function detail(id) {
         </p>
 
         ${
+          /**
+           * REGISTROS DE MANUTENÇÃO
+           *
+           * Apresenta as observações feitas
+           * pela oficina durante o atendimento.
+           */
           diario.length
             ? diario.map(entry => `
                 <div class="panel">
@@ -1862,6 +2752,16 @@ async function detail(id) {
         }
 
         ${
+          /**
+           * FORMULÁRIO DO DIÁRIO
+           *
+           * A oficina pode registrar observações
+           * quando o serviço está aprovado,
+           * em execução ou concluído.
+           *
+           * Essa regra controla a apresentação
+           * do formulário no frontend.
+           */
           me.perfil === "OFICINA" &&
           ["APROVADO", "EM_EXECUCAO", "CONCLUIDO"]
             .includes(item.status)
@@ -1893,6 +2793,13 @@ async function detail(id) {
         </p>
 
         ${
+          /**
+           * LISTAGEM DE ANEXOS
+           *
+           * Apresenta os arquivos relacionados
+           * ao atendimento e permite abri-los
+           * através de um botão específico.
+           */
           anexos.length
             ? anexos.map(anexo => `
                 <div class="panel">
@@ -1912,6 +2819,16 @@ async function detail(id) {
         }
 
         ${
+          /**
+           * ENVIO DE ARQUIVOS
+           *
+           * Clientes e oficinas podem anexar
+           * imagens e vídeos relacionados
+           * ao diagnóstico do veículo.
+           *
+           * O atributo accept orienta os tipos
+           * de arquivo selecionáveis.
+           */
           ["CLIENTE", "OFICINA"].includes(me.perfil)
             ? `
               <form id="attachment-form">
@@ -1938,6 +2855,12 @@ async function detail(id) {
 
         <div id="conversation">
           ${
+            /**
+             * HISTÓRICO DAS MENSAGENS
+             *
+             * As mensagens são apresentadas
+             * com remetente, data e conteúdo.
+             */
             mensagens.length
               ? mensagens.map(message => `
                   <div class="panel">
@@ -1955,6 +2878,13 @@ async function detail(id) {
         </div>
 
         ${
+          /**
+           * FORMULÁRIO DE MENSAGENS
+           *
+           * Permite a comunicação entre
+           * cliente e oficina durante
+           * o acompanhamento do serviço.
+           */
           ["CLIENTE", "OFICINA"].includes(me.perfil)
             ? `
               <form id="message-form">
@@ -1982,8 +2912,31 @@ async function detail(id) {
       </div>
     `;
 
+    /* ======================================
+       EVENTOS DOS DETALHES
+       ====================================== */
+
+    /**
+     * BOTÃO VOLTAR
+     *
+     * Retorna à interface principal
+     * sem atualizar toda a página.
+     */
     document.querySelector("#back").onclick = render;
 
+    /* ======================================
+       REGISTRO NO DIÁRIO
+       ====================================== */
+
+    /**
+     * ENVIO DE OBSERVAÇÕES
+     *
+     * O formulário registra informações
+     * relacionadas à manutenção do veículo.
+     *
+     * Após o envio, os detalhes são consultados
+     * novamente para apresentar o novo registro.
+     */
     const diaryForm = document.querySelector("#diary-form");
 
     if (diaryForm) {
@@ -2007,6 +2960,22 @@ async function detail(id) {
       };
     }
 
+    /* ======================================
+       ENVIO DE ANEXOS
+       ====================================== */
+
+    /**
+     * PROCESSAMENTO DE ARQUIVOS
+     *
+     * O frontend verifica o tamanho do arquivo
+     * antes de iniciar o envio.
+     *
+     * O limite definido nesta interface
+     * é de 3 MB por arquivo.
+     *
+     * O backend também deve validar tamanho,
+     * formato e autorização do usuário.
+     */
     const attachmentForm = document.querySelector(
       "#attachment-form"
     );
@@ -2021,12 +2990,28 @@ async function detail(id) {
 
         if (!file) return;
 
+        /**
+         * VALIDAÇÃO DE TAMANHO
+         *
+         * Impede o envio pela interface
+         * quando o arquivo ultrapassa 3 MB.
+         */
         if (file.size > 3 * 1024 * 1024) {
           alert("Arquivo deve ter no máximo 3 MB.");
           return;
         }
 
         try {
+          /**
+           * CONVERSÃO PARA BASE64
+           *
+           * Utilizo FileReader para converter
+           * o arquivo em uma representação
+           * que pode ser enviada no JSON.
+           *
+           * A conversão é assíncrona porque
+           * depende da leitura do arquivo.
+           */
           const base64 = await new Promise(
             (resolve, reject) => {
               const reader = new FileReader();
@@ -2042,6 +3027,12 @@ async function detail(id) {
             }
           );
 
+          /**
+           * ENVIO PARA O BACKEND
+           *
+           * São enviados o nome, o tipo
+           * e o conteúdo codificado do arquivo.
+           */
           await api(
             "/solicitacoes/" + id + "/anexos",
             "POST",
@@ -2052,6 +3043,10 @@ async function detail(id) {
             }
           );
 
+          /**
+           * Atualiza a tela para apresentar
+           * o arquivo enviado.
+           */
           await detail(id);
         } catch (error) {
           alert(error.message);
@@ -2059,6 +3054,19 @@ async function detail(id) {
       };
     }
 
+    /* ======================================
+       ABERTURA DOS ANEXOS
+       ====================================== */
+
+    /**
+     * VISUALIZAÇÃO DE ARQUIVOS
+     *
+     * O arquivo é solicitado ao backend
+     * com as credenciais do usuário.
+     *
+     * A resposta é convertida em Blob
+     * e disponibilizada por uma URL temporária.
+     */
     document.querySelectorAll(
       "[data-open-attachment]"
     ).forEach(button => {
@@ -2084,8 +3092,16 @@ async function detail(id) {
           const blob = await response.blob();
           const url = URL.createObjectURL(blob);
 
+          /**
+           * Abre o arquivo em uma nova aba,
+           * preservando a tela do atendimento.
+           */
           window.open(url, "_blank", "noopener");
 
+          /**
+           * Libera a URL temporária após
+           * o período definido.
+           */
           setTimeout(
             () => URL.revokeObjectURL(url),
             60000
@@ -2096,6 +3112,19 @@ async function detail(id) {
       };
     });
 
+    /* ======================================
+       MENSAGENS DO ATENDIMENTO
+       ====================================== */
+
+    /**
+     * ENVIO DE MENSAGENS
+     *
+     * Permite registrar a comunicação
+     * entre os participantes do atendimento.
+     *
+     * Após o envio, os dados são atualizados
+     * e a conversa é carregada novamente.
+     */
     const messageForm = document.querySelector(
       "#message-form"
     );
@@ -2122,6 +3151,13 @@ async function detail(id) {
       };
     }
   } catch (error) {
+    /**
+     * TRATAMENTO DE ERROS
+     *
+     * Se alguma consulta falhar,
+     * apresento a mensagem de erro
+     * e retorno à interface principal.
+     */
     flash(error.message, true);
     render();
   }
@@ -2131,6 +3167,18 @@ async function detail(id) {
    AVALIAÇÃO DE SERVIÇOS
    ========================================== */
 
+/**
+ * AVALIAÇÃO DO ATENDIMENTO
+ *
+ * Esta funcionalidade permite que o cliente
+ * registre sua opinião sobre o serviço realizado.
+ *
+ * A avaliação utiliza uma nota de 1 a 5
+ * e um comentário opcional.
+ *
+ * O objetivo é permitir o acompanhamento
+ * da satisfação dos clientes.
+ */
 function review(id) {
   document.querySelector(".content").innerHTML = `
     <h1>Avaliar serviço #${esc(id)}</h1>
@@ -2165,8 +3213,21 @@ function review(id) {
     </div>
   `;
 
+  /**
+   * Retorna à tela anterior sem
+   * recarregar toda a aplicação.
+   */
   document.querySelector("#back").onclick = render;
 
+  /**
+   * PROCESSAMENTO DA AVALIAÇÃO
+   *
+   * Os valores do formulário são coletados
+   * e enviados ao backend.
+   *
+   * A nota é convertida para número
+   * antes de realizar a requisição.
+   */
   document.querySelector(
     '[data-form="avaliacao"]'
   ).onsubmit = event => {
@@ -2192,4 +3253,18 @@ function review(id) {
    INICIALIZAÇÃO
    ========================================== */
 
+/**
+ * INICIALIZAÇÃO DO LAUNCHCONTROL
+ *
+ * A aplicação começa apresentando a tela
+ * de autenticação.
+ *
+ * Após o login, as informações do usuário
+ * são carregadas e a interface principal
+ * é renderizada.
+ *
+ * Mantive a inicialização no final do arquivo
+ * para que as funções estejam declaradas
+ * antes de sua primeira utilização.
+ */
 loginScreen();

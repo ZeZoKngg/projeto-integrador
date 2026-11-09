@@ -1,6 +1,6 @@
-# 🏎️ LaunchControl — Sistema de Gestão para Oficinas Automotivas
+# 🏎️ LaunchControl — Sistema de Gestão Automotiva
 
-> 📚 **Projeto Integrador** — Trabalho acadêmico em grupo, em desenvolvimento.
+Projeto Integrador desenvolvido durante o curso, com o objetivo de criar um sistema web para auxiliar no gerenciamento de oficinas automotivas.
 
 ## 👥 Equipe
 
@@ -8,90 +8,75 @@
 - **Gabriel Teodoro** ([@GabrielTeodoro7](https://github.com/GabrielTeodoro7))
 - **Miguel Luiz** ([@ZeZoKngg](https://github.com/ZeZoKngg))
 
-## 📌 Sobre o Projeto
+## 📌 Sobre o projeto
 
-O **LaunchControl** é uma plataforma web desenvolvida para modernizar e facilitar o gerenciamento de oficinas automotivas.
+O LaunchControl é um sistema desenvolvido para facilitar a comunicação entre clientes e oficinas automotivas, além de ajudar na organização dos serviços.
 
-O projeto tem como objetivo proporcionar uma experiência mais prática, organizada e eficiente para clientes e profissionais do setor automotivo, reunindo diferentes funcionalidades em uma interface intuitiva e acessível.
+A ideia surgiu da necessidade de tornar o atendimento mais prático, permitindo que os clientes acompanhem suas solicitações e que as oficinas tenham um controle melhor dos serviços realizados.
 
-### 🎯 Objetivos
-
-- Facilitar a organização e o gerenciamento de oficinas automotivas.
-- Melhorar a experiência de clientes e profissionais.
-- Simplificar o cadastro e o acesso dos usuários.
-- Oferecer uma interface moderna, intuitiva e responsiva.
-- Automatizar processos e otimizar o atendimento.
-- Proporcionar maior praticidade na utilização dos serviços.
-
-## 🚀 Tecnologias Utilizadas
-
-### Backend
-- **Java** — Desenvolvimento da lógica e das funcionalidades do sistema.
-- **Spring Boot** — Framework para construção da aplicação.
-- **Spring Security** — Autenticação e controle de acesso.
-- **Maven** — Gerenciamento de dependências.
-
-### Frontend
-- **HTML5** — Estrutura das páginas.
-- **CSS3** — Estilização e responsividade.
-- **JavaScript** — Interatividade e funcionalidades da interface.
-
-### Ferramentas
-- **Visual Studio Code** — Ambiente de desenvolvimento.
-- **Git e GitHub** — Versionamento de código e colaboração.
+O projeto ainda está em desenvolvimento e recebe melhorias conforme avançamos nas etapas da faculdade.
 
 ## ⚙️ Funcionalidades
 
-- Cadastro de clientes e profissionais.
-- Login e autenticação de usuários.
-- Recuperação de senha por e-mail (em fase de testes).
-- Gerenciamento de informações e serviços automotivos.
-- Interface responsiva e intuitiva.
-- Navegação entre diferentes áreas do sistema.
+- Cadastro e login de usuários.
+- Cadastro e gerenciamento de veículos.
+- Solicitação de serviços automotivos.
+- Criação e aprovação de orçamentos.
+- Acompanhamento dos serviços.
+- Consulta e pesquisa de peças.
+- Notificações e comunicação entre cliente e oficina.
+- Recuperação de senha por e-mail (em testes).
 
-## ▶️ Como Rodar
+## 💻 Tecnologias utilizadas
 
-### Pré-requisitos
+**Backend**
+- Java
+- Spring Boot
+- Spring Security
+- Maven
+- MySQL
 
-- Java JDK 17 ou superior.
-- Maven.
-- Git.
-- Visual Studio Code ou outra IDE compatível.
-- Configurações locais necessárias para executar o projeto.
+**Frontend**
+- HTML
+- CSS
+- JavaScript
 
-### 1. Clonar o repositório
+**Ferramentas**
+- Visual Studio Code
+- Git e GitHub
+
+## ▶️ Como executar o projeto
+
+Para executar o sistema, é necessário ter o Java JDK 17, o Maven e o MySQL instalados e configurados.
+
+**1. Clone o repositório:**
 
 ```bash
-git clone URL_DO_REPOSITORIO
-cd launchcontrol-oficina
+git clone https://github.com/ZeZoKngg/projeto-integrador.git
 ```
 
-### 2. Acessar o backend
+**2. Entre na pasta do projeto:**
 
 ```bash
-cd backend
+cd projeto-integrador/LaunchControl/backend
 ```
 
-### 3. Iniciar a aplicação
+**3. Configure a conexão com o MySQL** no arquivo `application.properties`, de acordo com seu ambiente.
+
+**4. Inicie o backend:**
 
 ```bash
 mvn spring-boot:run
 ```
 
-### 4. Acessar o LaunchControl
-
-Após iniciar a aplicação, abra o navegador e acesse:
+**5. Abra o sistema no navegador:**
 
 http://localhost:8080
 
-## 📈 Status do Projeto
+## 📈 Status
 
-🚧 **Em desenvolvimento**
-
-O LaunchControl está em constante evolução, com novas funcionalidades, melhorias na interface e testes sendo realizados durante o desenvolvimento.
+O LaunchControl está em desenvolvimento. Ainda estamos realizando testes, corrigindo erros e implementando melhorias nas funcionalidades e na interface.
 
 ---
 
-**Desenvolvido por Gabriel Teodoro e Miguel Luiz.**
-
-📚 Projeto Integrador — LaunchControl.
+**Projeto Integrador — Desenvolvido por Ana Letícia, Gabriel Teodoro e Miguel Luiz.**
